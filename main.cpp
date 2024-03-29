@@ -15,7 +15,7 @@ struct var
 
 	var() {}
 	var(char _name[5], std::string _val) { name = _name; val = _val; }
-}
+};
 
 struct tss
 {
@@ -142,4 +142,4 @@ struct tss
 		}
 	}
 
-}
+};
