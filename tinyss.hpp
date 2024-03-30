@@ -16,6 +16,9 @@ struct tss
 {
 	std::vector<varb> vars;
 	std::vector<std::string> stack;
+	static std::string gcall;
+	static bool called;
+	static bool work;
 
 	int find(std::string name);
 	void set(std::string name, std::string val);
