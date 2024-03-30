@@ -11,12 +11,27 @@ void run()
 {
 	std::vector<std::string> code =
 	{
-		"define test 125",
+		"define test 26",
+		"define not 126",
+		"if test e 25",
+		"op test * 5",
 		"gpushb $test",
 		"gcall testcout",
-		
+		"else",
+		"gpushb $not",
+		"gcall testcout",
+		"end"
 	};
-	a.docode(code);
+	TSSException b = a.docode(code);
+	// std::cout << "Index: " << std::to_string(b.index);
+	// switch(b.token.type)
+	// {
+	// 	case tkntp::com: std::cout << " Type: Command "; break;
+	// 	case tkntp::var: std::cout << " Type: Variable "; break;
+	// 	case tkntp::val: std::cout << " Type: Value "; break;
+	// 	case tkntp::lab: std::cout << " Type: Label "; break;
+	// }
+	// std::cout << "Value: " << b.token.val << std::endl;
 }
 
 int main()

@@ -3,6 +3,17 @@
 #include <string>
 #include <vector>
 
+#include "token.hpp"
+
+struct TSSException
+{
+	int index;
+	tkn token;
+
+	TSSException();
+	TSSException(int _index, tkn _token);
+};
+
 struct varb
 {
 	std::string name;
@@ -24,8 +35,8 @@ struct tss
 	void set(std::string name, std::string val);
 	std::string get(std::string name);
 	void del(std::string name);
-	void gfunc(std::string name);
-	int docode(std::vector<std::string> code);
+	//void gfunc(std::string name);
+	TSSException docode(std::vector<std::string> code);
 
 	tss();
 };

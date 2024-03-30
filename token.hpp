@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 
 enum tkntp // token type
