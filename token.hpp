@@ -3,7 +3,7 @@
 enum tkntp // token type
 {
 	com, var, lab, val
-}
+};
 
 struct tkn // token
 {
@@ -11,7 +11,7 @@ struct tkn // token
 	std::string val;
 
 	tkn() {}
-	tkn(tkn _type) { type = _type; }
-	tkn(tkn _type, std::string _val) { type = _type; val = _val; }
+	tkn(tkntp _type) { type = _type; }
+	tkn(tkntp _type, std::string _val) { type = _type; val = _val; }
 
 };
