@@ -7,6 +7,10 @@
 #define cur cod[i]
 #define cuv vars[i]
 
+std::string tss::gcall = "";
+bool tss::called = false;
+bool tss::work = false;
+
 varb::varb() {}
 varb::varb(std::string _name, std::string _val) { name = _name; val = _val; }
 
@@ -36,6 +40,7 @@ void tss::del(std::string name)
 	if(i != -1) vars.erase(vars.begin() + i);
 }
 
+/*
 void tss::gfunc(std::string name)
 {
 	if(name == "testcout")
@@ -43,6 +48,7 @@ void tss::gfunc(std::string name)
 		std::cout << "etar" << stack[0] << std::endl;
 	}
 }
+*/
 
 int tss::docode(vecstr code)
 {
@@ -112,7 +118,9 @@ int tss::docode(vecstr code)
 			else if(cur.val == "gcall")
 			{
 				i++;
-				gfunc(cur.val);
+				//gfunc(cur.val);
+				gcall = cur.val;
+				called = true;
 				stack.clear();
 			}
 			else if(cur.val == "gpushb")
@@ -126,6 +134,7 @@ int tss::docode(vecstr code)
 			}
 		}
 	}
+	if(work) work = false;
 	return 0;
 }
 
