@@ -1,10 +1,13 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <thread>
 
 #include "tinyss.hpp"
 
-int main()
+tss a;
+
+void run()
 {
 	std::vector<std::string> code =
 	{
@@ -13,8 +16,14 @@ int main()
 		"gcall testcout",
 		
 	};
-
-	tss a;
 	a.docode(code);
+}
+
+int main()
+{
+	std::thread ads(run);
+	ads.detach();
+	a.work = true;
+	while(a.work) { if(a.called) { if (a.gcall == "testcout") { std::cout << "etar" << a.stack[0] << std::endl; a.called = false; } } }
 	return 0;
 }
