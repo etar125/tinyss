@@ -27,15 +27,15 @@ struct tss
 {
 	std::vector<varb> vars;
 	std::vector<std::string> stack;
-	static std::string gcall;
-	static bool called;
-	static bool work;
+	// static std::string gcall;
+	// static bool called;
+	// static bool work;
 
 	int find(std::string name);
 	void set(std::string name, std::string val);
 	std::string get(std::string name);
 	void del(std::string name);
-	//void gfunc(std::string name);
+	void gfunc(std::string name);
 	TSSException docode(std::vector<std::string> code);
 
 	tss();

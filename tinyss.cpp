@@ -7,9 +7,9 @@
 #define cur cod[i]
 #define cuv vars[i]
 
-std::string tss::gcall = "";
-bool tss::called = false;
-bool tss::work = false;
+// std::string tss::gcall = "";
+// bool tss::called = false;
+// bool tss::work = false;
 
 TSSException::TSSException() { TSSException::index = -1; }
 TSSException::TSSException(int _index, tkn _token) { TSSException::index = _index; TSSException::token = _token; }
@@ -134,9 +134,7 @@ TSSException tss::docode(vecstr code)
 			{
 				i++;
 				//gfunc(cur.val);
-				gcall = cur.val;
-				called = true;
-				stack.clear();
+				gfunc(cur.val);
 			}
 			else if(cur.val == "gpushb")
 			{
@@ -190,16 +188,16 @@ TSSException tss::docode(vecstr code)
 					else return TSSException(i, cur);
 					i--;
 					if(cur.type != tkntp::val) return TSSException(i, cur);
-					if(cur.val == "e") if(first == val) is = true;
-					else if(cur.val == "ne") if(first != val) is = true;
-					else if(cur.val == "g") if(std::stoi(first) > std::stoi(val)) is = true;
-					else if(cur.val == "ge") if(std::stoi(first) >= std::stoi(val)) is = true;
-					else if(cur.val == "ng") if(!(std::stoi(first) > std::stoi(val))) is = true;
-					else if(cur.val == "nge") if(!(std::stoi(first) >= std::stoi(val))) is = true;
-					else if(cur.val == "l") if(std::stoi(first) < std::stoi(val)) is = true;
-					else if(cur.val == "le") if(std::stoi(first) <= std::stoi(val)) is = true;
-					else if(cur.val == "nl") if(!(std::stoi(first) < std::stoi(val))) is = true;
-					else if(cur.val == "nle") if(!(std::stoi(first) <= std::stoi(val))) is = true;
+					if(cur.val == "e" && first == val) is = true;
+					else if(cur.val == "ne" && first != val) is = true;
+					else if(cur.val == "g" && std::stoi(first) > std::stoi(val)) is = true;
+					else if(cur.val == "ge" && std::stoi(first) >= std::stoi(val)) is = true;
+					else if(cur.val == "ng" && !(std::stoi(first) > std::stoi(val))) is = true;
+					else if(cur.val == "nge" && !(std::stoi(first) >= std::stoi(val))) is = true;
+					else if(cur.val == "l" && std::stoi(first) < std::stoi(val)) is = true;
+					else if(cur.val == "le" && std::stoi(first) <= std::stoi(val)) is = true;
+					else if(cur.val == "nl" && !(std::stoi(first) < std::stoi(val))) is = true;
+					else if(cur.val == "nle" && !(std::stoi(first) <= std::stoi(val))) is = true;
 					i++;
 					if(!is)
 					{
@@ -217,7 +215,6 @@ TSSException tss::docode(vecstr code)
 			}
 		}
 	}
-	if(work) work = false;
 	return TSSException();
 }
 

@@ -5,10 +5,15 @@
 
 #include "tinyss.hpp"
 
-tss a;
-
-void run()
+// Определяем функции, даже если их нет
+void tss::gfunc(std::string name)
 {
+	if(name == "testcout") std::cout << "etar" << tss::stack[0] << std::endl;
+}
+
+int main()
+{
+	tss a;
 	std::vector<std::string> code = // наш код
 	{
 		"define test 25",
@@ -34,14 +39,5 @@ void run()
 	}
 	std::cout << "Value: " << b.token.val << std::endl;
 	*/
-}
-
-int main()
-{
-	std::thread ads(run);
-	ads.detach(); // Отсоединяем TSS от текущего потока, чтобы проверять функции
-	a.work = true; // ставим, что программа работает
-	// Пока программа работает, проверяем вызвана ли функция, если да, то проверяем имя и выполняем нужный код
-	while(a.work) { if(a.called) { if (a.gcall == "testcout") { std::cout << "etar" << a.stack[0] << std::endl; a.called = false; } } }
 	return 0;
 }
