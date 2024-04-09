@@ -135,6 +135,7 @@ TSSException tss::docode(vecstr code)
 				i++;
 				//gfunc(cur.val);
 				gfunc(cur.val);
+				stack.clear();
 			}
 			else if(cur.val == "gpushb")
 			{
