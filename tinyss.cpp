@@ -68,6 +68,7 @@ TSSException tss::docode(vecstr code)
 	// 	}
 	// 	std::cout << "Value: " << ch.val << std::endl;
 	// }
+	std::vector<int> lc; // for call command
 	for(int i = 0; i < cod.size(); i++)
 	{
 		if(cur.type != tkntp::com) return TSSException(i, cur);
@@ -151,7 +152,7 @@ TSSException tss::docode(vecstr code)
 				if(iff)
 				{
 					iff = false;
-					for(int a = 0; a < cod.size(); a++)
+					for(int a = i + 1; a < cod.size(); a++)
 					{
 						if(cod[a].type == tkntp::com && cod[a].val == "end")
 						{
@@ -166,7 +167,7 @@ TSSException tss::docode(vecstr code)
 				if(iff)
 				{
 					iff = false;
-					for(int a = 0; a < cod.size(); a++)
+					for(int a = i + 1; a < cod.size(); a++)
 					{
 						if(cod[a].type == tkntp::com && cod[a].val == "end")
 						{
@@ -202,7 +203,7 @@ TSSException tss::docode(vecstr code)
 					i++;
 					if(!is)
 					{
-						for(int a = 0; a < cod.size(); a++)
+						for(int a = i; a < cod.size(); a++)
 						{
 							if(cod[a].type == tkntp::com && (cod[a].val == "elif" || cod[a].val == "else" || cod[a].val == "end"))
 							{
