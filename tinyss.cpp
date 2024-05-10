@@ -57,24 +57,27 @@ TSSException tss::docode(vecstr code)
 {
 	bool iff = false;
 	std::vector<tkn> cod = Lexer(code);
-	// for(tkn ch : cod)
-	// {
-	// 	switch(ch.type)
-	// 	{
-	// 		case tkntp::com: std::cout << "Type: Command "; break;
-	// 		case tkntp::var: std::cout << "Type: Variable "; break;
-	// 		case tkntp::val: std::cout << "Type: Value "; break;
-	// 		case tkntp::lab: std::cout << "Type: Label "; break;
-	// 	}
-	// 	std::cout << "Value: " << ch.val << std::endl;
-	// }
+	/*
+	for(tkn ch : cod)
+	{
+		switch(ch.type)
+		{
+			case tkntp::com: std::cout << "Type: Command "; break;
+			case tkntp::var: std::cout << "Type: Variable "; break;
+			case tkntp::val: std::cout << "Type: Value "; break;
+			case tkntp::lab: std::cout << "Type: Label "; break;
+		}
+		std::cout << "Value: " << ch.val << std::endl;
+	}
+	*/
 	std::vector<int> lc; // for call command
 	for(int i = 0; i < cod.size(); i++)
 	{
 		if(cur.type != tkntp::com) return TSSException(i, cur);
 		else
 		{
-			if(cur.val == "define")
+			if(cur.val == "exit") break;
+			else if(cur.val == "define")
 			{
 
 				std::string name = "";
@@ -124,13 +127,31 @@ TSSException tss::docode(vecstr code)
 				{
 					if(cod[a].type == tkntp::lab)
 					{
-						a++;
-						if(cod[a].type != tkntp::val) return TSSException(i, cur);
 						if(cod[a].val == cur.val) { i = a; findl = true; break; }
 					}
 				}
 				if(!findl) return TSSException(i, cur);
 			}
+			else if(cur.val == "call")
+			{
+				i++;
+				bool findl = false;
+				for(int a = 0; a < cod.size(); a++)
+				{
+					if(cod[a].type == tkntp::lab)
+					{
+						if(cod[a].val == cur.val)
+						{
+							lc.push_back(i);
+							i = a;
+							findl = true;
+							break;
+						}
+					}
+				}
+				if(!findl) return TSSException(i, cur);
+			}
+			else if(cur.val == "ret" && lc.size() != 0) { i = lc[lc.size() - 1]; lc.erase(lc.begin() + lc.size()); }
 			else if(cur.val == "gcall")
 			{
 				i++;

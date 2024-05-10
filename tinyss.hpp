@@ -7,7 +7,7 @@
 
 struct TSSException
 {
-	int index;
+	int index = -1;
 	tkn token;
 
 	TSSException();

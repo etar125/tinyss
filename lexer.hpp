@@ -35,16 +35,20 @@ std::vector<tkn> Lexer(vecstr code)
 	bool com = true;
 	for(std::string s : code)
 	{
-		res = split(trip(s), ' ');
-		for(int i = 0; i < res.size(); i++)
+		std::string st = trip(s);
+		if(st != "")
 		{
-			if(res[i][0] == ';') break;
-			else if(res[i][0] == '$') result.push_back(tkn(tkntp::var, res[i].substr(1)));
-			else if(res[i][0] == ':') result.push_back(tkn(tkntp::lab, res[i].substr(1)));
-			else if(com) { result.push_back(tkn(tkntp::com, res[i])); com = false; }
-			else result.push_back(tkn(tkntp::val, res[i]));
+			res = split(trip(st), ' ');
+			for(int i = 0; i < res.size(); i++)
+			{
+				if(res[i][0] == ';') break;
+				else if(res[i][0] == '$') result.push_back(tkn(tkntp::var, res[i].substr(1)));
+				else if(res[i][0] == ':') { result.push_back(tkn(tkntp::lab, res[i].substr(1))); }
+				else if(com) { result.push_back(tkn(tkntp::com, res[i])); com = false; }
+				else result.push_back(tkn(tkntp::val, res[i]));
+			}
+			com = true;
 		}
-		com = true;
 	}
 	return result;
 }

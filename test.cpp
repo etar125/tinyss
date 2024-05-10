@@ -20,14 +20,45 @@ int main()
 		"define not 126",
 		"if test e 25",
 		"op test * 5",
-		"gpushb $test",
-		"gcall testcout",
+		"call cout",
 		"else",
 		"gpushb $not",
 		"gcall testcout",
-		"end"
+		"end",
+		"exit",
+		":cout",
+		"gpushb $test",
+		"gcall testcout",
+		"ret"
 	};
-	TSSException b = a.docode(code); // выполняем код
+	TSSException te = a.docode(code);
+	if(te.index != -1)
+	{
+		std::cout << "TSSException: index " << std::to_string(te.index) << " token:[ ";
+		if(te.token.type == tkntp::com) std::cout << "command, ";
+		else if(te.token.type == tkntp::var) std::cout << "variable, ";
+		else if(te.token.type == tkntp::lab) std::cout << "label, ";
+		else if(te.token.type == tkntp::val) std::cout << "value, ";
+		std::cout << "\"" << te.token.val << "\" ]\n" << code[te.index] << std::endl;
+	}
+	code[0] = "define test 26";
+	te = a.docode(code);
+	if(te.index != -1)
+	{
+		std::cout << "TSSException: index " << std::to_string(te.index) << " token:[ ";
+		if(te.token.type == tkntp::com) std::cout << "command, ";
+		else if(te.token.type == tkntp::var) std::cout << "variable, ";
+		else if(te.token.type == tkntp::lab) std::cout << "label, ";
+		else if(te.token.type == tkntp::val) std::cout << "value, ";
+		std::cout << "\"" << te.token.val << "\" ]\n" << code[te.index] << std::endl;
+	}
+
+	// Вывод:
+	// etar125
+	// etar126
+	// Код работает правильно
+
+	 // выполняем код
 	/* Данный код нужен для отладки
 	std::cout << "Index: " << std::to_string(b.index);
 	switch(b.token.type)
