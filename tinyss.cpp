@@ -73,7 +73,7 @@ TSSException tss::docode(vecstr code)
 	std::vector<int> lc; // for call command
 	for(int i = 0; i < cod.size(); i++)
 	{
-		if(cur.type != tkntp::com || cur.type != tkntp::lab) return TSSException(i, cur, "Command was excepted");
+		if(cur.type != tkntp::com && cur.type != tkntp::lab) return TSSException(i, cur, "Command was excepted");
 		else if(cur.type == tkntp::com)
 		{
 			if(cur.val == "exit") break;
