@@ -12,7 +12,7 @@
 // bool tss::work = false;
 
 TSSException::TSSException() { TSSException::index = -1; }
-TSSException::TSSException(int _index, tkn _token) { TSSException::index = _index; TSSException::token = _token; }
+TSSException::TSSException(int _index, tkn _token, std::string _message) { TSSException::index = _index; TSSException::token = _token; TSSException::message = _message; }
 
 varb::varb() {}
 varb::varb(std::string _name, std::string _val) { name = _name; val = _val; }
@@ -73,7 +73,7 @@ TSSException tss::docode(vecstr code)
 	std::vector<int> lc; // for call command
 	for(int i = 0; i < cod.size(); i++)
 	{
-		if(cur.type != tkntp::com) return TSSException(i, cur);
+		if(cur.type != tkntp::com) return TSSException(i, cur, "Command was excepted");
 		else
 		{
 			if(cur.val == "exit") break;
@@ -83,12 +83,12 @@ TSSException tss::docode(vecstr code)
 				std::string name = "";
 				std::string val = "";
 				i++;
-				if(cur.type != tkntp::val) return TSSException(i, cur);
+				if(cur.type != tkntp::val) return TSSException(i, cur, "Value was excepted");
 				else name = cur.val;
 				i++;
 				if(cur.type == tkntp::val) val = cur.val;
 				else if(cur.type == tkntp::var) val = get(cur.val);
-				else return TSSException(i, cur);
+				else return TSSException(i, cur, "Value/Variable was excepted");
 				set(name, val);
 			}
 			else if(cur.val == "op")
@@ -96,14 +96,14 @@ TSSException tss::docode(vecstr code)
 				std::string name = "";
 				std::string val = "";
 				i++;
-				if(cur.type != tkntp::val) return TSSException(i, cur);
+				if(cur.type != tkntp::val) return TSSException(i, cur, "Value was excepted");
 				else name = cur.val;
 				i++;
-				if(cur.type != tkntp::val) return TSSException(i, cur);
+				if(cur.type != tkntp::val) return TSSException(i, cur, "Value was excepted");
 				i++;
 				if(cur.type == tkntp::val) val = cur.val;
 				else if(cur.type == tkntp::var) val = get(cur.val);
-				else return TSSException(i, cur);
+				else return TSSException(i, cur, "Value/Variable was excepted");
 				i--;
 				if(cur.val == "+") set(name, std::to_string(std::stoi(get(name)) + std::stoi(val)));
 				else if(cur.val == "-") set(name, std::to_string(std::stoi(get(name)) - std::stoi(val)));
@@ -115,7 +115,7 @@ TSSException tss::docode(vecstr code)
 			{
 				std::string name = "";
 				i++;
-				if(cur.type != tkntp::val) return TSSException(i, cur);
+				if(cur.type != tkntp::val) return TSSException(i, cur, "Value was excepted");
 				else name = cur.val;
 				del(name);
 			}
@@ -130,7 +130,7 @@ TSSException tss::docode(vecstr code)
 						if(cod[a].val == cur.val) { i = a; findl = true; break; }
 					}
 				}
-				if(!findl) return TSSException(i, cur);
+				if(!findl) return TSSException(i, cur, "Not found label");
 			}
 			else if(cur.val == "call")
 			{
@@ -149,7 +149,7 @@ TSSException tss::docode(vecstr code)
 						}
 					}
 				}
-				if(!findl) return TSSException(i, cur);
+				if(!findl) return TSSException(i, cur, "Not found label");
 			}
 			else if(cur.val == "ret" && lc.size() != 0) { i = lc[lc.size() - 1]; lc.erase(lc.begin() + lc.size()); }
 			else if(cur.val == "gcall")
@@ -165,7 +165,7 @@ TSSException tss::docode(vecstr code)
 				i++;
 				if(cur.type == tkntp::val) val = cur.val;
 				else if(cur.type == tkntp::var) val = get(cur.val);
-				else return TSSException(i, cur);
+				else return TSSException(i, cur, "Value/Variable was excepted");
 				stack.push_back(val);
 			}
 			else if(cur.val == "else")
@@ -177,7 +177,7 @@ TSSException tss::docode(vecstr code)
 					{
 						if(cod[a].type == tkntp::com && cod[a].val == "end")
 						{
-							i = a;
+							i = a - 1;
 							break;
 						}
 					}
@@ -192,7 +192,7 @@ TSSException tss::docode(vecstr code)
 					{
 						if(cod[a].type == tkntp::com && cod[a].val == "end")
 						{
-							i = a;
+							i = a - 1;
 							break;
 						}
 					}
@@ -203,14 +203,14 @@ TSSException tss::docode(vecstr code)
 					std::string val = "";
 					bool is = false;
 					i++;
-					if(cur.type != tkntp::val) return TSSException(i, cur);
+					if(cur.type != tkntp::val) return TSSException(i, cur, "Value was excepted");
 					first = get(cur.val);
 					i++; i++;
 					if(cur.type == tkntp::val) val = cur.val;
 					else if(cur.type == tkntp::var) val = get(cur.val);
-					else return TSSException(i, cur);
+					else return TSSException(i, cur, "Value/Variable was excepted");
 					i--;
-					if(cur.type != tkntp::val) return TSSException(i, cur);
+					if(cur.type != tkntp::val) return TSSException(i, cur, "Value was excepted");
 					if(cur.val == "e" && first == val) is = true;
 					else if(cur.val == "ne" && first != val) is = true;
 					else if(cur.val == "g" && std::stoi(first) > std::stoi(val)) is = true;
@@ -228,7 +228,7 @@ TSSException tss::docode(vecstr code)
 						{
 							if(cod[a].type == tkntp::com && (cod[a].val == "elif" || cod[a].val == "else" || cod[a].val == "end"))
 							{
-								i = a--;
+								i = a - 1;
 								break;
 							}
 						}

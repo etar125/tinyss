@@ -19,16 +19,19 @@ int main()
 		"define test 25",
 		"define not 126",
 		"if test e 25",
-		"op test * 5",
-		"call cout",
+			"op test * 5",
+			"call cout",
+		"elif test e 5",
+			"op test * 25",
+			"call cout",
 		"else",
-		"gpushb $not",
-		"gcall testcout",
+			"gpushb $not",
+			"gcall testcout",
 		"end",
 		"exit",
 		":cout",
-		"gpushb $test",
-		"gcall testcout",
+			"gpushb $test",
+			"gcall testcout",
 		"ret"
 	};
 	TSSException te = a.docode(code);
@@ -39,7 +42,18 @@ int main()
 		else if(te.token.type == tkntp::var) std::cout << "variable, ";
 		else if(te.token.type == tkntp::lab) std::cout << "label, ";
 		else if(te.token.type == tkntp::val) std::cout << "value, ";
-		std::cout << "\"" << te.token.val << "\" ]\n" << code[te.index] << std::endl;
+		std::cout << "\"" << te.token.val << "\" ]\n" << te.message << std::endl;
+	}
+	code[0] = "define test 5";
+	te = a.docode(code);
+	if(te.index != -1)
+	{
+		std::cout << "TSSException: index " << std::to_string(te.index) << " token:[ ";
+		if(te.token.type == tkntp::com) std::cout << "command, ";
+		else if(te.token.type == tkntp::var) std::cout << "variable, ";
+		else if(te.token.type == tkntp::lab) std::cout << "label, ";
+		else if(te.token.type == tkntp::val) std::cout << "value, ";
+		std::cout << "\"" << te.token.val << "\" ]\n" << te.message << std::endl;
 	}
 	code[0] = "define test 26";
 	te = a.docode(code);
@@ -50,7 +64,7 @@ int main()
 		else if(te.token.type == tkntp::var) std::cout << "variable, ";
 		else if(te.token.type == tkntp::lab) std::cout << "label, ";
 		else if(te.token.type == tkntp::val) std::cout << "value, ";
-		std::cout << "\"" << te.token.val << "\" ]\n" << code[te.index] << std::endl;
+		std::cout << "\"" << te.token.val << "\" ]\n" << te.message << std::endl;
 	}
 
 	// Вывод:

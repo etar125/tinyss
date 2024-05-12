@@ -9,9 +9,10 @@ struct TSSException
 {
 	int index = -1;
 	tkn token;
+	std::string message;
 
 	TSSException();
-	TSSException(int _index, tkn _token);
+	TSSException(int _index, tkn _token, std::string _message);
 };
 
 struct varb
