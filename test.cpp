@@ -5,7 +5,7 @@
 
 #include "tinyss.hpp"
 
-// Определяем функции, даже если их нет
+// Определяем метод с функциями, даже если их нет
 void tss::gfunc(std::string name)
 {
 	if(name == "testcout") std::cout << "etar" << tss::stack[0] << std::endl;
@@ -68,6 +68,7 @@ int main()
 	}
 
 	// Вывод:
+	// etar125
 	// etar125
 	// etar126
 	// Код работает правильно

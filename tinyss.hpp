@@ -37,7 +37,7 @@ struct tss
 	std::string get(std::string name);
 	void del(std::string name);
 	void gfunc(std::string name);
-	TSSException docode(std::vector<std::string> code);
+	TSSException docode(std::vector<std::string> code, bool debug = false);
 
 	tss();
 };
