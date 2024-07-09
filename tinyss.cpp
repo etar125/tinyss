@@ -194,6 +194,57 @@ TSSException tss::docode(vecstr code, bool debug) {
 					}
 					else iff = true;
 				}
+			} else if(cur.val == "stradd") {
+				i++;
+				std::string one = "";
+				std::string two = "";
+				if(cur.type == tkntp::val) one = get(cur.val);
+				else return TSSException(i, cur, "Value was excepted");
+				i++;
+				if(cur.type == tkntp::val) two = get(cur.val);
+				else return TSSException(i, cur, "Value was excepted");
+				set(one, one+two);
+			} else if(cur.val == "substr") {
+				i++;
+				std::string to = "";
+				int pos = 0;
+				int len = 0;
+				if(cur.type == tkntp::val) to = cur.val;
+				else return TSSException(i, cur, "Value was excepted");
+				i++;
+				if(cur.type == tkntp::val) pos = std::stoi(cur.val);
+				else if(cur.type == tkntp::var) pos = std::stoi(get(cur.val));
+				else return TSSException(i, cur, "Value/Variable was excepted");
+				i++;
+				if(cur.type == tkntp::val) len = std::stoi(cur.val);
+				else if(cur.type == tkntp::var) len = std::stoi(get(cur.val));
+				else return TSSException(i, cur, "Value/Variable was excepted");
+				std::string temp = "";
+				std::string kkk = get(to);
+				for(int i = pos; i < to.length() && i < pos + len; i++) {
+					temp += kkk[i];
+				}
+				tss::set(to, kkk);
+			} else if(cur.val == "strins") {
+				i++;
+				std::string one = "";
+				std::string two = "";
+				int pos = 0;
+				if(cur.type == tkntp::val) one = cur.val;
+				else return TSSException(i, cur, "Value was excepted");
+				i++;
+				if(cur.type == tkntp::val) two = cur.val;
+				else return TSSException(i, cur, "Value was excepted");
+				i++;
+				if(cur.type == tkntp::val) pos = std::stoi(cur.val);
+				else if(cur.type == tkntp::var) pos = std::stoi(get(cur.val));
+				else return TSSException(i, cur, "Value/Variable was excepted");
+				std::string str = get(one);
+				set(one, str.insert(pos, get(two)));
+			} else if(cur.val == "strlen") {
+				i++;
+				if(cur.type == tkntp::val) set(cur.val, std::to_string(get(cur.val).length()));
+				else return TSSException(i, cur, "Value was excepted");
 			}
 		}
 	}
