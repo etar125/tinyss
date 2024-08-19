@@ -128,10 +128,9 @@ TSSException tss::docode(vecstr code, bool debug) {
 					}
 				}
 				if(!findl) return TSSException(i, cur, "Not found label");
-			} else if(cur.val == "ret" && !lc.empty()) { i = lc[lc.size() - 1]; lc.erase(lc.begin() + lc.size()); }
+			} else if(cur.val == "ret" && !lc.empty()) { i = lc.back(); lc.pop_back(); }
 			else if(cur.val == "gcall") {
 				i++;
-				//gfunc(cur.val);
 				gfunc(cur.val);
 				stack.clear();
 			} else if(cur.val == "gpushb") {
