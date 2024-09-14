@@ -1,4 +1,4 @@
-FLAGS=-O2 -ffunction-sections -Wl,--gc-sections,--strip-all -fno-asynchronous-unwind-tables
+FLAGS=-Os -ffunction-sections -Wl,--gc-sections,--strip-all -fno-asynchronous-unwind-tables
 
 default: $(shell mkdir -p bin) library test
 
