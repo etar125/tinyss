@@ -16,6 +16,8 @@ int main()
 	tss a;
 	std::vector<std::string> code = // наш код
 	{
+		"define test \"TEEEEST !!!'",
+		"call cout",
 		"define test 25",
 		"define not 126",
 		"if test e 25",
