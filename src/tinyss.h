@@ -27,6 +27,6 @@ void tss_delvar(tss_varlist *list, char *name);
 void tss_gfunc(tss_varlist *list, char *name);
 tss_exception tss_docode(char *code, long unsigned int size);
 
-void tss_printerr(tss_exception *e);
+void tss_printerr(tss_exception e);
 
 #endif

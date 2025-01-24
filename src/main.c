@@ -6,12 +6,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-void tss_printerr(tss_exception *e) {
-    if(e->code == 0) return;
-    printf("%d:%d ", e->line, e->symbol);
-    if(e->code == 1) {
+void tss_printerr(tss_exception e) {
+    if(e.code == 0) return;
+    printf("%d:%d ", e.line, e.symbol);
+    if(e.code == 1) {
         printf("unknown error\n");
-    } else if(e->code == 2) {
+    } else if(e.code == 2) {
         printf("too many args\n");
     }
 }
