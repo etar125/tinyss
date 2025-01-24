@@ -43,11 +43,10 @@ tss_exception tss_docode(char *code, size_t size) {
 
             argc=1;
             argpos[0] = i + 1;
-        } else if(code[i] == ' ') {
-            if(argc == 1 && argpos[0]-i==0) {
-                argpos[0]=i;
-            }
-            if(argc < 5) {
+        } else if(code[i] == ' ' || code[i] == '\t') {
+            if(argc == 1 && (argpos[0] - i) == 0) {
+                argpos[0] = i + 1;
+            } else if(argc < 5) {
                 argpos[argc] = i + 1;
                 argc++;
             } else {
