@@ -5,7 +5,13 @@
 #include <malloc.h>
 
 void tss_vlapp(tss_varlist *list) {
-    if(list == NULL) return;
+    if(list == NULL) { return; }
+    if(list->list == NULL) {
+        list->size = 1;
+        list->list = malloc(sizeof(tss_var*));
+        return;
+    }
+    
     size_t prev_size = list->size;
     
     /* change size */
@@ -27,7 +33,8 @@ void tss_vlapp(tss_varlist *list) {
 
 size_t tss_findvar(tss_varlist *list, char *name) {
     for(size_t i = 0; i < list->size; i++) {
-        if(strcmp(list->list[i]->name, name) == 0)
+        if(list->list[i] != NULL &&
+           strcmp(list->list[i]->name, name) == 0)
             return i;
     } return (size_t)-1;
 }
