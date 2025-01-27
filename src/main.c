@@ -30,7 +30,8 @@ bool tss_strcmp(char *data1, size_t size1, char *data2, size_t size2) {
 
 tss_exception tss_docode(char *code, size_t size) {
     uint8_t argc = 1;
-    size_t argpos[6], line = 0;
+    size_t argpos[6], line = 0, psize;
+    char *cmd;
     tss_exception ret;
     ret.code = 0;
     argpos[0] = 0;
@@ -38,8 +39,9 @@ tss_exception tss_docode(char *code, size_t size) {
         if(code[i] == '\n') {
             argpos[argc] = i + 1;
             line++;
-            if(tss_strcmp(&code[argpos[0]], argpos[1] - argpos[0] - 1,
-                          "nop", 3)) { }
+            cmd = &code[argpos[0]];
+            psize = argpos[1] - argpos[0] - 1;
+            if(tss_strcmp(cmd, psize, "nop", 3)) { }
 
             argc=1;
             argpos[0] = i + 1;
