@@ -45,6 +45,22 @@ void tss_setvar(tss_varlist *list, char *name, char *val) {
         free(list->list[i]->value);
         list->list[i]->value = malloc(sizeof(char) * len);
         memcpy(list->list[i]->value, val, len);
+    } else {
+        while(1) {
+            for(size_t i = 0; i < list->size; i++) {
+                if(list->list[i] == NULL) {
+                    tss_var *var = malloc(sizeof(tss_var));
+                    size_t nsize = strlen(name),
+                           vsize = strlen(val);
+                    var->name = malloc(sizeof(char) * nsize);
+                    memcpy(var->name, name, nsize);
+                    var->value = malloc(sizeof(char) * vsize);
+                    memcpy(var->value, val, vsize);
+                    list->list[i] = var;
+                    return;
+                }
+            } tss_vlapp(list);
+        }
     }
 }
 char* tss_getvar(tss_varlist *list, char *name) {
