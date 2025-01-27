@@ -28,7 +28,7 @@ bool tss_strcmp(char *data1, size_t size1, char *data2, size_t size2) {
     } return true;
 }
 
-tss_exception tss_docode(char *code, size_t size) {
+tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 1;
     size_t argpos[6], line = 0, psize;
     char *cmd;
