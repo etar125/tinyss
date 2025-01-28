@@ -13,7 +13,7 @@ typedef struct {
 } tss_var;
 
 typedef struct {
-    tss_var **list;
+    tss_var *list;
     long unsigned int size;
 } tss_varlist;
 
