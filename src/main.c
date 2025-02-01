@@ -33,7 +33,7 @@ bool tss_strcmp(char *data1, size_t size1, char *data2, size_t size2) {
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 1;
     size_t argpos[6], line = 0, psize;
-    char *arg, sp = 0, *stack[8], *tmp, *tmp2;
+    char *arg, sp = 0, *stack[8], *tmp;
     tss_exception ret;
     ret.code = 0;
     argpos[0] = 0;
