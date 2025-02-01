@@ -4,6 +4,12 @@
 #include <string.h>
 #include <malloc.h>
 
+void tss_vlinit(tss_varlist *list) {
+    if(list == NULL) { return; }
+    list->size = 0;
+    list->list = NULL;
+}
+
 void tss_vlapp(tss_varlist *list) {
     if(list == NULL) { return; }
     if(list->list == NULL) {

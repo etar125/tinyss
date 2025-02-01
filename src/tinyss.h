@@ -17,6 +17,7 @@ typedef struct {
     long unsigned int size;
 } tss_varlist;
 
+void tss_vlinit(tss_varlist *list);
 void tss_vlapp(tss_varlist *list);
 
 long unsigned int tss_findvar(tss_varlist *list, char *name);

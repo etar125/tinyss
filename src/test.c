@@ -12,9 +12,9 @@ void tss_gfunc(tss_varlist *list, char *name, char *stack[], char sp) {
 }
 
 int main(void) {
-    char code[] = "nop\ngpushb etar125\ngcall print\n";
+    char code[] = "\t  nop\n  gpushb\thello_from_tinyss\n gcall print\n";
     tss_varlist list;
-    tss_vlapp(&list);
+    tss_vlinit(&list);
     tss_printerr(tss_docode(&list, code, strlen(code)));
     return 0;
 }
