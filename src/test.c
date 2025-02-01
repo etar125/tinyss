@@ -3,11 +3,9 @@
 #include <string.h>
 #include <malloc.h>
 
-void tss_gfunc(tss_varlist *list, char *name, char *stack[], char sp) {
+void tss_gfunc(tss_varlist *list, tss_stack *stack, char *name) {
     if(strcmp(name, "print") == 0) {
-        if(sp != 0) {
-            printf("%s\n", stack[--sp]);
-        }
+        printf("%s\n", tss_pop(stack));
     }
 }
 
