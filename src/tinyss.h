@@ -34,7 +34,7 @@ void tss_setvar(tss_varlist *list, char *name, char *val);
 char* tss_getvar(tss_varlist *list, char *name);
 void tss_delvar(tss_varlist *list, char *name);
 
-void tss_gfunc(tss_varlist *list, char *name, char *stack[], char sp);
+void tss_gfunc(tss_varlist *list, tss_stack *stack, char *name);
 tss_exception tss_docode(tss_varlist *list, char *code, long unsigned int size);
 
 void tss_printerr(tss_exception e);
