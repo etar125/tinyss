@@ -3,9 +3,10 @@ CFLAGS=-Os -ffunction-sections -Wl,--gc-sections,--strip-all -fno-asynchronous-u
 
 build: $(shell mkdir -p bin) lib test
 
-lib: src/tinyss.h src/main.c src/var.c
+lib: src/tinyss.h src/main.c src/var.c src/stack.c
 	$(CC) -c src/main.c -o bin/main.o $(CFLAGS)
 	$(CC) -c src/var.c -o bin/var.o $(CFLAGS)
+	$(CC) -c src/stack.c -o bin/stack.o $(CFLAGS)
 	cp -f src/tinyss.h bin/
 	ar r bin/libtinyss.a bin/*.o
 	rm bin/*.o
