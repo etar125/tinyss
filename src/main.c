@@ -33,7 +33,9 @@ bool tss_strcmp(char *data1, size_t size1, char *data2, size_t size2) {
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 1;
     size_t argpos[6], line = 0, psize;
-    char *arg, sp = 0, *stack[8], *tmp;
+    char *arg, *tmp;
+    tss_stack st;
+    tss_sinit(&st);
     tss_exception ret;
     ret.code = 0;
     argpos[0] = 0;
@@ -63,31 +65,15 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     for(size_t i = 0; i < psize; i++) {
                         tmp[i] = arg[i];
                     } tmp[psize] = '\0';
-                    if(sp != 8) {
-                        tmp = tss_getvar(list, tmp);
-                        stack[sp] = malloc(strlen(tmp));
-                        strcpy(stack[sp], tmp);
-                        tmp = NULL;
-                        sp++;
-                    } else {
-                        free(tmp);
-                        _retset;
-                        ret.code = 5;
-                    }
+                    tss_push(&st, tss_getvar(list, tmp));
+                    free(tmp);
                 } else {
                     tmp = malloc(psize + 1);
                     for(size_t i = 0; i < psize; i++) {
                         tmp[i] = arg[i];
                     } tmp[psize] = '\0';
-                    if(sp != 8) {
-                        stack[sp] = tmp;
-                        tmp = NULL;
-                        sp++;
-                    } else {
-                        free(tmp);
-                        _retset;
-                        ret.code = 5;
-                    }
+                    tss_push(&st, tmp);
+                    free(tmp);
                 }
             } else if(tss_strcmp(arg, psize, "gcall", 5)) {
                 if(argc != 2) {
@@ -106,7 +92,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 for(size_t i = 0; i < psize; i++) {
                     tmp[i] = arg[i];
                 } tmp[psize] = '\0';
-                tss_gfunc(list, tmp, stack, sp);
+                tss_gfunc(list, &st, tmp);
                 free(tmp);
             }
 
