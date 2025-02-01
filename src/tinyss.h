@@ -17,6 +17,15 @@ typedef struct {
     long unsigned int size;
 } tss_varlist;
 
+typedef struct {
+    char *data[8];
+    unsigned char sp;
+} tss_stack;
+
+void tss_sinit(tss_stack *stack);
+char* tss_pop(tss_stack *stack);
+void tss_push(tss_stack *stack, char *data);
+
 void tss_vlinit(tss_varlist *list);
 void tss_vlapp(tss_varlist *list);
 
