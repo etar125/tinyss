@@ -109,6 +109,11 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 ret.code = 2;
                 return ret;
             }
+        } else if(code[i] == ':' && argc == 1 && (argpos[0] - i) == 0) {
+            while(code[i] != '\n') { i++; }
+            argc=1;
+            argpos[0] = i + 1;
+            continue;
         }
     } return ret;
 }
