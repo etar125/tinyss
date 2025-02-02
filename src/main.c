@@ -31,13 +31,18 @@ bool tss_strcmp(char *data1, size_t size1, char *data2, size_t size2) {
 }
 
 char schar(char ch) {
-    return ch; 
     if(ch == 'n') {
         return '\n';
     } else if(ch == 't') {
         return '\t';
     } else if(ch == 'a') {
         return '\033';
+    } else if(ch == '\\') {
+        return '\\';
+    } else if(ch == '\'') {
+        return '\'';
+    } else if(ch == '"') {
+        return '"';
     } return ch;
 }
 
@@ -154,7 +159,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 if(args[i].data != NULL) { free(args[i].data); }
                 tss_ainit(&args[i]);
             }
-        } else if((code[i] == '"' || code[i] == '\'') && (i != 0 && code[i - 1] != '\\')) {
+        } else if((code[i] == '"' || code[i] == '\'')) {
             if(com) { com = false; }
             else { com = true; }
         } else if(code[i] == ' ' || code[i] == '\t') {
@@ -168,10 +173,11 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     ret.code = 2;
                     return ret;
                 }
-            } else { tss_aadd(&args[argc], schar(code[i])); }
+            } else { tss_aadd(&args[argc], code[i]); }
         } else if(code[i] == ':' && argc == 0 && args[0].data == NULL) {
             while(code[i] != '\n') { i++; }
             continue;
-        } else { tss_aadd(&args[argc], schar(code[i])); }
+        } else if(code[i] == '\\') { tss_aadd(&args[argc], schar(code[++i])); }
+        else { tss_aadd(&args[argc], code[i]); }
     } return ret;
 }
