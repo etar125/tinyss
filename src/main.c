@@ -12,9 +12,17 @@ void tss_printerr(tss_exception e) {
     if(e.code == 0) return;
     printf("%d:%d [%d] ", e.line, e.symbol, e.code);
     if(e.code == 1) {
-        printf("unknown error\n");
+        printf("...\n");
     } else if(e.code == 2) {
         printf("too many args\n");
+    } else if(e.code == 3) {
+        printf("not enough args\n");
+    } else if(e.code == 4) {
+        printf("wrong args\n");
+    } else if(e.code == 5) {
+        printf("stack overflow\n");
+    } else {
+        printf("unknown error\n");
     }
 }
 
