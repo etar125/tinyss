@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define _retset ret.line = line; ret.symbol = i
+#define _retset ret.line = line; ret.symbol = ri
 
 void tss_printerr(tss_exception e) {
     if(e.code == 0) return;
@@ -94,7 +94,7 @@ void tss_ainit(tss_arg *a) {
 
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 0;
-    size_t line = 0, psize;
+    size_t i, ri = 0, line = 0, psize;
     char *arg, *tmp;
     tss_arg args[5];
     for(uint8_t i = 0; i < 5; i++) {
@@ -105,7 +105,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     tss_sinit(&st);
     tss_exception ret;
     ret.code = 0;
-    for(size_t i = 0; i < size; i++) {
+    for(i = 0; i < size; i++, ri++) {
         if(code[i] == '\n') {
             // argpos[argc] = i;
             line++;
@@ -166,7 +166,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
             for(uint8_t i = 0; i < 5; i++) {
                 if(args[i].data != NULL) { free(args[i].data); }
                 tss_ainit(&args[i]);
-            }
+            } ri = 0;
         } else if((code[i] == '"' || code[i] == '\'')) {
             if(com) { com = false; }
             else { com = true; }
