@@ -95,7 +95,7 @@ void tss_ainit(tss_arg *a) {
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 0;
     size_t i, ri = 0, line = 0, psize;
-    char *arg, *tmp;
+    char *arg;
     tss_arg args[5];
     for(uint8_t i = 0; i < 5; i++) {
         tss_ainit(&args[i]);
@@ -107,7 +107,6 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     ret.code = 0;
     for(i = 0; i < size; i++, ri++) {
         if(code[i] == '\n') {
-            // argpos[argc] = i;
             line++;
             arg = tss_aget(&args[0]);
             psize = strlen(arg);
@@ -127,19 +126,9 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 }
                 if(arg[0] == '$') {
                     arg++;
-                    tmp = malloc(psize + 1);
-                    for(size_t i = 0; i < psize; i++) {
-                        tmp[i] = arg[i];
-                    } tmp[psize] = '\0';
-                    tss_push(&st, tss_getvar(list, tmp));
-                    free(tmp);
+                    tss_push(&st, tss_getvar(list, arg));
                 } else {
-                    tmp = malloc(psize + 1);
-                    for(size_t i = 0; i < psize; i++) {
-                        tmp[i] = arg[i];
-                    } tmp[psize] = '\0';
-                    tss_push(&st, tmp);
-                    free(tmp);
+                    tss_push(&st, arg);
                 }
             } else if(tss_strcmp(arg, psize, "gcall", 5)) {
                 if(argc != 1) {
@@ -154,12 +143,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     ret.code = 4;
                     return ret;
                 }
-                tmp = malloc(psize + 1);
-                for(size_t i = 0; i < psize; i++) {
-                    tmp[i] = arg[i];
-                } tmp[psize] = '\0';
-                tss_gfunc(list, &st, tmp);
-                free(tmp);
+                tss_gfunc(list, &st, arg);
             }
 
             argc=0;
