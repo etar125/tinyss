@@ -115,7 +115,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
             else if(tss_strcmp(arg, psize, "gpushb", 6)) {
                 if(argc != 1) {
                     _retset;
-                    ret.code = argc < 2 ? 3 : 2;
+                    ret.code = argc < 1 ? 3 : 2;
                     return ret;
                 }
                 arg = tss_aget(&args[1]);
@@ -144,7 +144,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
             } else if(tss_strcmp(arg, psize, "gcall", 5)) {
                 if(argc != 1) {
                     _retset;
-                    ret.code = argc < 2 ? 3 : 2;
+                    ret.code = argc < 1 ? 3 : 2;
                     return ret;
                 }
                 arg = tss_aget(&args[1]);
