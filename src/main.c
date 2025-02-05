@@ -124,12 +124,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     ret.code = 4;
                     return ret;
                 }
-                if(arg[0] == '$') {
-                    arg++;
-                    tss_push(&st, tss_getvar(list, arg));
-                } else {
-                    tss_push(&st, arg);
-                }
+                tss_push(&st, arg[0] == '$' ? tss_getvar(list, ++arg) : arg);
             } else if(tss_strcmp(arg, psize, "gcall", 5)) {
                 if(argc != 1) {
                     _retset;
@@ -159,7 +154,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     ret.code = 4;
                     return ret;
                 }
-                tss_setvar(list, arg, tmp[0] == '$' ? tss_getvar(list, tmp) : tmp);
+                tss_setvar(list, arg, tmp[0] == '$' ? tss_getvar(list, ++tmp) : tmp);
             }
 
             argc=0;
