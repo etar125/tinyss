@@ -94,7 +94,7 @@ void tss_ainit(tss_arg *a) {
 
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 0;
-    size_t i, ri = 0, line = 0, psize, tsize;
+    size_t i, ri = 0, line = 0, psize;
     char *arg, *tmp;
     tss_arg args[5];
     for(uint8_t i = 0; i < 5; i++) {
@@ -132,8 +132,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     return ret;
                 }
                 arg = tss_aget(&args[1]);
-                psize = args[1].size;
-                if(psize == 0 || arg[0] == '$') {
+                if(strlen(arg) == 0 || arg[0] == '$') {
                     _retset;
                     ret.code = 4;
                     return ret;
@@ -146,10 +145,8 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     return ret;
                 }
                 arg = tss_aget(&args[1]);
-                psize = strlen(arg);
                 tmp = tss_aget(&args[2]);
-                tsize = strlen(tmp);
-                if(psize == 0 || arg[0] == '$' || tsize == 0) {
+                if(strlen(arg) == 0 || arg[0] == '$' || strlen(tmp) == 0) {
                     _retset;
                     ret.code = 4;
                     return ret;
