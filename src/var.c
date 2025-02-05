@@ -15,6 +15,7 @@ void tss_vlapp(tss_varlist *list) {
     if(list->list == NULL) {
         list->size = 1;
         list->list = malloc(sizeof(tss_var));
+        list->list[0].name = NULL;
         return;
     }
     
@@ -35,6 +36,8 @@ void tss_vlapp(tss_varlist *list) {
     for(i = 0; i < prev_size; i++) {
         nlist[i].name = list->list[i].name;
         nlist[i].value = list->list[i].value;
+    } for(; i < list->size; i++) {
+        nlist[i].name = NULL;
     }
     
     free(list->list);
