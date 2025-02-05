@@ -33,7 +33,7 @@ bool tss_ie(char *data, size_t size) {
 }
 bool tss_strcmp(char *data1, size_t size1, char *data2, size_t size2) {
     if(size1 != size2) return false;
-    for(size_t i = 0; i < size1 && i < size2; i++) {
+    for(size_t i = 0; i < size1; i++) {
         if(data1[i] != data2[i]) return false;
     } return true;
 }
