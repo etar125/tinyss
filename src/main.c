@@ -94,8 +94,8 @@ void tss_ainit(tss_arg *a) {
 
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 0;
-    size_t i, ri = 0, line = 0, psize;
-    char *arg;
+    size_t i, ri = 0, line = 0, psize, tsize;
+    char *arg, *tmp;
     tss_arg args[5];
     for(uint8_t i = 0; i < 5; i++) {
         tss_ainit(&args[i]);
@@ -144,6 +144,22 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     return ret;
                 }
                 tss_gfunc(list, &st, arg);
+            } else if(tss_strcmp(arg, psize, "define", 6)) {
+                if(argc != 2) {
+                    _retset;
+                    ret.code = argc < 2 ? 3 : 2;
+                    return ret;
+                }
+                arg = tss_aget(&args[1]);
+                psize = strlen(arg);
+                tmp = tss_aget(&args[2]);
+                tsize = strlen(tmp);
+                if(psize == 0 || arg[0] == '$' || tsize == 0) {
+                    _retset;
+                    ret.code = 4;
+                    return ret;
+                }
+                tss_setvar(list, arg, tmp[0] == '$' ? tss_getvar(list, tmp) : tmp);
             }
 
             argc=0;
