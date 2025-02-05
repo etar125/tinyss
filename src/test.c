@@ -10,7 +10,7 @@ void tss_gfunc(tss_varlist *list, tss_stack *stack, char *name) {
 }
 
 int main(void) {
-    char code[] = "\t  nop\n  :\tx\ndefine var test\n  gpushb\t\"hello из \\\\\\\"tinyss\\\\\\''\n gcall\tprint\n";
+    char code[] = "\t  nop\n  :\tx\ndefine var \"hello из \\\\\\\"tinyss\\\\\\''\n  gpushb\t$var\n gcall\tprint\n";
     tss_varlist list;
     tss_vlinit(&list);
     tss_printerr(tss_docode(&list, code, strlen(code)));
