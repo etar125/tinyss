@@ -11,19 +11,20 @@
 
 #define checkargc(e) if(argc != e) { _retset; ret.code = argc < e ? 3 : 2; return ret; }
 
+char *tss_code[] = {
+    "no error",
+    "test error?",
+    "too many args",
+    "not enough args",
+    "wrong args",
+    "stack overflow"
+};
+
 void tss_printerr(tss_exception e) {
     if(e.code == 0) return;
     printf("%d:%d [%d] ", e.line, e.symbol, e.code);
-    if(e.code == 1) {
-        printf("...\n");
-    } else if(e.code == 2) {
-        printf("too many args\n");
-    } else if(e.code == 3) {
-        printf("not enough args\n");
-    } else if(e.code == 4) {
-        printf("wrong args\n");
-    } else if(e.code == 5) {
-        printf("stack overflow\n");
+    if(e.code < 6) {
+        printf("%s\n", tss_code[e.code]);
     } else {
         printf("unknown error\n");
     }
