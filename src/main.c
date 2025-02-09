@@ -1,6 +1,7 @@
 #include "tinyss.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
 #include <stdint.h>
@@ -94,6 +95,39 @@ void tss_ainit(tss_arg *a) {
     return a->data;
 }
 
+void reverse(char str[], int length) {
+    int start = 0;
+    int end = length - 1;
+    while(start < end) {
+        char temp = str[start];
+        str[start] = str[end];
+        str[end] = temp;
+        end--;
+        start++;
+    }
+} char* ltoa(long int num, char* str, int base) {
+    int i = 0;
+    bool m = false;
+    if(num == 0) {
+        str[i++] = '0';
+        str[i] = '\0';
+        return str;
+    }
+    if(num < 0 && base == 10) {
+        m = true;
+        num = -num;
+    }
+    while (num != 0) {
+        int rem = num % base;
+        str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
+        num = num / base;
+    }
+    if(m) { str[i++] = '-'; }
+    str[i] = '\0';
+    reverse(str, i);
+    return str;
+}
+
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 0;
     size_t i, ri = 0, line = 0, psize;
@@ -145,6 +179,48 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
             } else if(tss_strcmp(arg, psize, "del", 3)) {
                 checkargc(1);
                 tss_delvar(list, tss_aget(&args[1]));
+            } else if(tss_strcmp(arg, psize, "op", 2)) {
+                checkargc(3);
+                arg  = tss_aget(&args[1]);
+                tmp2 = tss_aget(&args[2]);
+                tmp  = tss_aget(&args[3]);
+                tmp  = tmp[0] == '$' ? tss_getvar(list, ++tmp) : tmp;
+                if(arg == NULL || tmp == NULL) {
+                    _retset;
+                    ret.code = 6;
+                    return ret;
+                } if(strlen(tmp2) != 1) {
+                    _retset;
+                    ret.code = 4;
+                    return ret;
+                }
+                long int a = atol(tss_getvar(list, arg)), b = atol(tmp);
+                char *buff = malloc(32);
+                switch(tmp2[0]) {
+                    case '+':
+                        tss_setvar(list, arg, ltoa(a + b, buff, 10));
+                        break;
+                    case '-':
+                        tss_setvar(list, arg, ltoa(a - b, buff, 10));
+                        break;
+                    case '*':
+                        tss_setvar(list, arg, ltoa(a * b, buff, 10));
+                        break;
+                    case '/':
+                        tss_setvar(list, arg, ltoa(a / b, buff, 10));
+                        break;
+                    case '%':
+                        tss_setvar(list, arg, ltoa(a % b, buff, 10));
+                        break;
+                    case '^':
+                        tss_setvar(list, arg, ltoa(a ^ b, buff, 10));
+                        break;
+                    default:
+                        _retset;
+                        ret.code = 4;
+                        return ret;
+                        break;
+                } free(buff);
             }
 
             argc=0;
