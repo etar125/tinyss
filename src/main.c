@@ -199,32 +199,32 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     return ret;
                 }
                 long int a = atol(tss_getvar(list, arg1)), b = atol(arg3);
-                char *buff = malloc(32);
+                tmp1 = malloc(32);
                 switch(arg2[0]) {
                     case '+':
-                        tss_setvar(list, arg1, ltoa(a + b, buff, 10));
+                        tss_setvar(list, arg1, ltoa(a + b, tmp1, 10));
                         break;
                     case '-':
-                        tss_setvar(list, arg1, ltoa(a - b, buff, 10));
+                        tss_setvar(list, arg1, ltoa(a - b, tmp1, 10));
                         break;
                     case '*':
-                        tss_setvar(list, arg1, ltoa(a * b, buff, 10));
+                        tss_setvar(list, arg1, ltoa(a * b, tmp1, 10));
                         break;
                     case '/':
-                        tss_setvar(list, arg1, ltoa(a / b, buff, 10));
+                        tss_setvar(list, arg1, ltoa(a / b, tmp1, 10));
                         break;
                     case '%':
-                        tss_setvar(list, arg1, ltoa(a % b, buff, 10));
+                        tss_setvar(list, arg1, ltoa(a % b, tmp1, 10));
                         break;
                     case '^':
-                        tss_setvar(list, arg1, ltoa(a ^ b, buff, 10));
+                        tss_setvar(list, arg1, ltoa(a ^ b, tmp1, 10));
                         break;
                     default:
                         _retset;
                         ret.code = 4;
                         return ret;
                         break;
-                } free(buff);
+                } free(tmp1);
             }
 
             // обнуление аргументов
