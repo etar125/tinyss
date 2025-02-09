@@ -131,7 +131,8 @@ void reverse(char str[], int length) {
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 0;
     size_t i, ri = 0, line = 0, psize;
-    char *arg, *tmp, *tmp2;
+    char *arg0, *arg1, *arg2, *arg3, *arg4,
+         *tmp1, *tmp2;
     tss_arg args[5];
     for(uint8_t i = 0; i < 5; i++) {
         tss_ainit(&args[i]);
@@ -144,76 +145,76 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     for(i = 0; i < size; i++, ri++) {
         if(code[i] == '\n') {
             line++;
-            arg = tss_aget(&args[0]);
-            psize = strlen(arg);
-            if(tss_strcmp(arg, psize, "nop", 3)) { }
-            else if(tss_strcmp(arg, psize, "gpushb", 6)) {
+            arg0 = tss_aget(&args[0]);
+            psize = strlen(arg0);
+            if(tss_strcmp(arg0, psize, "nop", 3)) { }
+            else if(tss_strcmp(arg0, psize, "gpushb", 6)) {
                 checkargc(1);
-                arg = tss_aget(&args[1]);
-                psize = strlen(arg);
-                if(psize == 0 || (psize == 1 && arg[0] == '$')) {
+                arg1 = tss_aget(&args[1]);
+                psize = strlen(arg1);
+                if(psize == 0 || (psize == 1 && arg1[0] == '$')) {
                     _retset;
                     ret.code = 4;
                     return ret;
                 }
-                tss_push(&st, arg[0] == '$' ? tss_getvar(list, ++arg) : arg);
-            } else if(tss_strcmp(arg, psize, "gcall", 5)) {
+                tss_push(&st, arg1[0] == '$' ? tss_getvar(list, ++arg1) : arg1);
+            } else if(tss_strcmp(arg0, psize, "gcall", 5)) {
                 checkargc(1);
-                arg = tss_aget(&args[1]);
-                if(strlen(arg) == 0 || arg[0] == '$') {
+                arg1 = tss_aget(&args[1]);
+                if(strlen(arg1) == 0 || arg1[0] == '$') {
                     _retset;
                     ret.code = 4;
                     return ret;
                 }
-                tss_gfunc(list, &st, arg);
-            } else if(tss_strcmp(arg, psize, "define", 6)) {
+                tss_gfunc(list, &st, arg1);
+            } else if(tss_strcmp(arg0, psize, "define", 6)) {
                 checkargc(2);
-                arg = tss_aget(&args[1]);
-                tmp = tss_aget(&args[2]);
-                if(strlen(arg) == 0 || arg[0] == '$' || strlen(tmp) == 0) {
+                arg1 = tss_aget(&args[1]);
+                arg2 = tss_aget(&args[2]);
+                if(strlen(arg1) == 0 || arg1[0] == '$' || strlen(arg2) == 0) {
                     _retset;
                     ret.code = 4;
                     return ret;
                 }
-                tss_setvar(list, arg, tmp[0] == '$' ? tss_getvar(list, ++tmp) : tmp);
-            } else if(tss_strcmp(arg, psize, "del", 3)) {
+                tss_setvar(list, arg1, arg2[0] == '$' ? tss_getvar(list, ++arg2) : arg2);
+            } else if(tss_strcmp(arg0, psize, "del", 3)) {
                 checkargc(1);
                 tss_delvar(list, tss_aget(&args[1]));
-            } else if(tss_strcmp(arg, psize, "op", 2)) {
+            } else if(tss_strcmp(arg0, psize, "op", 2)) {
                 checkargc(3);
-                arg  = tss_aget(&args[1]);
-                tmp2 = tss_aget(&args[2]);
-                tmp  = tss_aget(&args[3]);
-                tmp  = tmp[0] == '$' ? tss_getvar(list, ++tmp) : tmp;
-                if(arg == NULL || tmp == NULL) {
+                arg1  = tss_aget(&args[1]);
+                arg2  = tss_aget(&args[2]);
+                arg3  = tss_aget(&args[3]);
+                arg3  = arg3[0] == '$' ? tss_getvar(list, ++arg3) : arg3;
+                if(arg1 == NULL || arg3 == NULL) {
                     _retset;
                     ret.code = 6;
                     return ret;
-                } if(strlen(tmp2) != 1) {
+                } if(strlen(arg2) != 1) {
                     _retset;
                     ret.code = 4;
                     return ret;
                 }
-                long int a = atol(tss_getvar(list, arg)), b = atol(tmp);
+                long int a = atol(tss_getvar(list, arg1)), b = atol(arg3);
                 char *buff = malloc(32);
-                switch(tmp2[0]) {
+                switch(arg2[0]) {
                     case '+':
-                        tss_setvar(list, arg, ltoa(a + b, buff, 10));
+                        tss_setvar(list, arg1, ltoa(a + b, buff, 10));
                         break;
                     case '-':
-                        tss_setvar(list, arg, ltoa(a - b, buff, 10));
+                        tss_setvar(list, arg1, ltoa(a - b, buff, 10));
                         break;
                     case '*':
-                        tss_setvar(list, arg, ltoa(a * b, buff, 10));
+                        tss_setvar(list, arg1, ltoa(a * b, buff, 10));
                         break;
                     case '/':
-                        tss_setvar(list, arg, ltoa(a / b, buff, 10));
+                        tss_setvar(list, arg1, ltoa(a / b, buff, 10));
                         break;
                     case '%':
-                        tss_setvar(list, arg, ltoa(a % b, buff, 10));
+                        tss_setvar(list, arg1, ltoa(a % b, buff, 10));
                         break;
                     case '^':
-                        tss_setvar(list, arg, ltoa(a ^ b, buff, 10));
+                        tss_setvar(list, arg1, ltoa(a ^ b, buff, 10));
                         break;
                     default:
                         _retset;
