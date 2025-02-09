@@ -142,8 +142,10 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     tss_sinit(&st);
     tss_exception ret;
     ret.code = 0;
+    
     for(i = 0; i < size; i++, ri++) {
         if(code[i] == '\n') {
+            /* выполнение команды */
             line++;
             arg0 = tss_aget(&args[0]);
             psize = strlen(arg0);
@@ -224,6 +226,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 } free(buff);
             }
 
+            // обнуление аргументов
             argc=0;
             for(uint8_t i = 0; i < 5; i++) {
                 if(args[i].data != NULL) { free(args[i].data); }
@@ -233,9 +236,8 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
             if(com) { com = false; }
             else { com = true; }
         } else if(code[i] == ' ' || code[i] == '\t') {
-            if(argc == 0 && args[0].data == NULL) {
-                
-            } else if(!com) {
+            if(argc == 0 && args[0].data == NULL) { }
+            else if(!com) {
                 if(argc < 5) {
                     argc++;
                 } else {
@@ -249,5 +251,9 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
             continue;
         } else if(code[i] == '\\') { tss_aadd(&args[argc], schar(code[++i])); }
         else { tss_aadd(&args[argc], code[i]); }
-    } return ret;
+    }
+    for(uint8_t i = 0; i < 5; i++) {
+        if(args[i].data != NULL) { free(args[i].data); }
+    }
+    return ret;
 }
