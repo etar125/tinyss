@@ -152,6 +152,13 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     return ret;
                 }
                 tss_setvar(list, arg, tmp[0] == '$' ? tss_getvar(list, ++tmp) : tmp);
+            } else if(tss_strcmp(arg, psize, "del", 3)) {
+                if(argc != 1) {
+                    _retset;
+                    ret.code = argc < 1 ? 3 : 2;
+                    return ret;
+                }
+                tss_delvar(list, tss_aget(&args[1]));
             }
 
             argc=0;
