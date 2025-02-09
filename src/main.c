@@ -8,6 +8,8 @@
 
 #define _retset ret.line = line; ret.symbol = ri
 
+#define checkargc(e) if(argc != e) { _retset; ret.code = argc < e ? 3 : 2; return ret; }
+
 void tss_printerr(tss_exception e) {
     if(e.code == 0) return;
     printf("%d:%d [%d] ", e.line, e.symbol, e.code);
@@ -95,7 +97,7 @@ void tss_ainit(tss_arg *a) {
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 0;
     size_t i, ri = 0, line = 0, psize;
-    char *arg, *tmp;
+    char *arg, *tmp, *tmp2;
     tss_arg args[5];
     for(uint8_t i = 0; i < 5; i++) {
         tss_ainit(&args[i]);
@@ -112,11 +114,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
             psize = strlen(arg);
             if(tss_strcmp(arg, psize, "nop", 3)) { }
             else if(tss_strcmp(arg, psize, "gpushb", 6)) {
-                if(argc != 1) {
-                    _retset;
-                    ret.code = argc < 1 ? 3 : 2;
-                    return ret;
-                }
+                checkargc(1);
                 arg = tss_aget(&args[1]);
                 psize = strlen(arg);
                 if(psize == 0 || (psize == 1 && arg[0] == '$')) {
@@ -126,11 +124,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 }
                 tss_push(&st, arg[0] == '$' ? tss_getvar(list, ++arg) : arg);
             } else if(tss_strcmp(arg, psize, "gcall", 5)) {
-                if(argc != 1) {
-                    _retset;
-                    ret.code = argc < 1 ? 3 : 2;
-                    return ret;
-                }
+                checkargc(1);
                 arg = tss_aget(&args[1]);
                 if(strlen(arg) == 0 || arg[0] == '$') {
                     _retset;
@@ -139,11 +133,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 }
                 tss_gfunc(list, &st, arg);
             } else if(tss_strcmp(arg, psize, "define", 6)) {
-                if(argc != 2) {
-                    _retset;
-                    ret.code = argc < 2 ? 3 : 2;
-                    return ret;
-                }
+                checkargc(2);
                 arg = tss_aget(&args[1]);
                 tmp = tss_aget(&args[2]);
                 if(strlen(arg) == 0 || arg[0] == '$' || strlen(tmp) == 0) {
@@ -153,11 +143,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 }
                 tss_setvar(list, arg, tmp[0] == '$' ? tss_getvar(list, ++tmp) : tmp);
             } else if(tss_strcmp(arg, psize, "del", 3)) {
-                if(argc != 1) {
-                    _retset;
-                    ret.code = argc < 1 ? 3 : 2;
-                    return ret;
-                }
+                checkargc(1);
                 tss_delvar(list, tss_aget(&args[1]));
             }
 
