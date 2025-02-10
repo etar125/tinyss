@@ -202,22 +202,22 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 tmp1 = malloc(32);
                 switch(arg2[0]) {
                     case '+':
-                        tss_setvar(list, arg1, ltoa(a + b, tmp1, 10));
+                        tss_setvar(list, arg1, itoa(a + b, tmp1, 10));
                         break;
                     case '-':
-                        tss_setvar(list, arg1, ltoa(a - b, tmp1, 10));
+                        tss_setvar(list, arg1, itoa(a - b, tmp1, 10));
                         break;
                     case '*':
-                        tss_setvar(list, arg1, ltoa(a * b, tmp1, 10));
+                        tss_setvar(list, arg1, itoa(a * b, tmp1, 10));
                         break;
                     case '/':
-                        tss_setvar(list, arg1, ltoa(a / b, tmp1, 10));
+                        tss_setvar(list, arg1, itoa(a / b, tmp1, 10));
                         break;
                     case '%':
-                        tss_setvar(list, arg1, ltoa(a % b, tmp1, 10));
+                        tss_setvar(list, arg1, itoa(a % b, tmp1, 10));
                         break;
                     case '^':
-                        tss_setvar(list, arg1, ltoa(a ^ b, tmp1, 10));
+                        tss_setvar(list, arg1, itoa(a ^ b, tmp1, 10));
                         break;
                     default:
                         _retset;
