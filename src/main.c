@@ -106,7 +106,7 @@ void reverse(char str[], int length) {
         end--;
         start++;
     }
-} char* ltoa(long int num, char* str, int base) {
+} char* itoa(int num, char* str, int base) {
     int i = 0;
     bool m = false;
     if(num == 0) {
@@ -198,7 +198,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     ret.code = 4;
                     return ret;
                 }
-                long int a = atol(tss_getvar(list, arg1)), b = atol(arg3);
+                int a = atoi(tss_getvar(list, arg1)), b = atoi(arg3);
                 tmp1 = malloc(32);
                 switch(arg2[0]) {
                     case '+':
