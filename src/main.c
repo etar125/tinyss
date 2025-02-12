@@ -65,7 +65,6 @@ typedef struct {
 void tss_ainit(tss_arg *a) {
     if(a == NULL) { return; }
     a->data = NULL;
-    a->size = 0;
     a->pos = 0;
 } void tss_aadd(tss_arg *a, char ch) {
     if(a == NULL) { return; }
@@ -78,13 +77,13 @@ void tss_ainit(tss_arg *a) {
     if(a->pos == a->size) {
         char *old = a->data;
         size_t prev = a->size;
-        a->size += prev / 4;
+        a->size += prev / 2;
         a->data = malloc(a->size);
         memcpy(a->data, old, prev);
         free(old);
     } a->data[a->pos++] = ch;
 } char* tss_aget(tss_arg *a) {
-    if(a == NULL) { return NULL; }
+    if(a == NULL || a->data == NULL) { return NULL; }
     if(a->pos == a->size) {
         char *old = a->data;
         size_t prev = a->size;
@@ -127,6 +126,15 @@ void reverse(char str[], int length) {
     str[i] = '\0';
     reverse(str, i);
     return str;
+} int _pow(int i, int n) {
+    int res = 1;
+    for(;;) {
+        if (n & 1)
+            res *= i;
+        n >>= 1;
+        if(!n) { break; }
+        i *= i;
+    } return res;
 }
 
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
@@ -136,6 +144,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
          *tmp1, *tmp2;
     tss_arg args[5];
     for(uint8_t i = 0; i < 5; i++) {
+        args[i].data = NULL;
         tss_ainit(&args[i]);
     }
     bool com = false;
@@ -144,9 +153,8 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     tss_exception ret;
     ret.code = 0;
     
-    for(i = 0; i < size; i++, ri++) {
-        if(code[i] == '\n') {
-            /* выполнение команды */
+    for(i = 0; i <= size; i++, ri++) {
+        if(code[i] == '\n' || i == size) {
             line++;
             arg0 = tss_aget(&args[0]);
             psize = strlen(arg0);
@@ -199,7 +207,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     return ret;
                 }
                 int a = atoi(tss_getvar(list, arg1)), b = atoi(arg3);
-                tmp1 = malloc(32);
+                tmp1 = malloc(13);
                 switch(arg2[0]) {
                     case '+':
                         tss_setvar(list, arg1, itoa(a + b, tmp1, 10));
@@ -217,7 +225,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                         tss_setvar(list, arg1, itoa(a % b, tmp1, 10));
                         break;
                     case '^':
-                        tss_setvar(list, arg1, itoa(a ^ b, tmp1, 10));
+                        tss_setvar(list, arg1, itoa(_pow(a, b), tmp1, 10));
                         break;
                     default:
                         _retset;
@@ -226,13 +234,10 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                         break;
                 } free(tmp1);
             }
-
-            // обнуление аргументов
-            argc=0;
-            for(uint8_t i = 0; i < 5; i++) {
+            for(uint8_t i = 0; i < argc + 1; i++) {
                 if(args[i].data != NULL) { free(args[i].data); }
                 tss_ainit(&args[i]);
-            } ri = 0;
+            } ri = 0, argc = 0;
         } else if((code[i] == '"' || code[i] == '\'')) {
             if(com) { com = false; }
             else { com = true; }
@@ -248,13 +253,9 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 }
             } else { tss_aadd(&args[argc], code[i]); }
         } else if(code[i] == ':' && argc == 0 && args[0].data == NULL) {
-            while(code[i] != '\n') { i++; }
+            while(i < size && code[i] != '\n') { i++; }
             continue;
         } else if(code[i] == '\\') { tss_aadd(&args[argc], schar(code[++i])); }
         else { tss_aadd(&args[argc], code[i]); }
-    }
-    for(uint8_t i = 0; i < 5; i++) {
-        if(args[i].data != NULL) { free(args[i].data); }
-    }
-    return ret;
+    } return ret;
 }
