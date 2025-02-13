@@ -14,6 +14,13 @@ void tss_gfunc(tss_varlist *list, tss_stack *stack, char *name) {
 int main(void) {
     char code[] =
     ":rem main\n\
+    gpushb \"goto test\"\n\
+    gcall printline\n\
+    goto main\n\
+    \n\
+    gpushb \"не должно выводиться\"\n\
+    gcall printline\n\
+    \n\
     :main\n\
     \tdefine a 2\n\
         define\tb 512\n\
