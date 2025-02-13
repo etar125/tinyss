@@ -17,13 +17,14 @@ char *tss_code[] = {
     "too many args",
     "not enough args",
     "wrong args",
-    "stack overflow"
+    "stack overflow",
+    "not found label"
 };
 
 void tss_printerr(tss_exception e) {
     if(e.code == 0) return;
     printf("%d:%d [%d] ", e.line, e.symbol, e.code);
-    if(e.code < 6) {
+    if(e.code < 7) {
         printf("%s\n", tss_code[e.code]);
     } else {
         printf("unknown error\n");
@@ -154,7 +155,8 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     ret.code = 0;
     
     for(i = 0; i <= size; i++, ri++) {
-        if(code[i] == '\n' || i == size) {
+        if(i == size || code[i] == '\n') {
+            if(argc == 0 && args[0].data == NULL) { continue; }
             line++;
             arg0 = tss_aget(&args[0]);
             psize = strlen(arg0);
@@ -233,7 +235,53 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                         return ret;
                         break;
                 } free(tmp1);
+            } else if(tss_strcmp(arg0, psize, "goto", 4)) {
+                checkargc(1);
+                arg1 = tss_aget(&args[1]);
+                if(arg1[0] == '$') {
+                    _retset;
+                    ret.code = 4;
+                    return ret;
+                }
+                
+                bool started = false;
+                int pos = 0;
+                for(size_t a = 0; a <= size; a++) {
+                    if(arg1[pos] == '\0') {
+                        if(a == size - 1 || code[a] == '\n') {
+                            while(code[a] != '\n' && a < size) {
+                                a++;
+                            } i = a;
+                            break;
+                        } while(code[a] != '\n' && a < size) {
+                            a++;
+                        } pos = 0;
+                        started = false;
+                    }
+                    if(code[a] == '\n' || a == size) {
+                        started = false;
+                        pos = 0;
+                        continue;
+                    }
+                    if(!started) {
+                        if(code[a] == ' ' || code[a] == '\t') { continue; }
+                        else if(code[a] != ':') {
+                            while(code[a] != '\n' && a < size) { a++; } pos = 0;
+                        } else { started = true; }
+                        continue;
+                    } if(code[a] == arg1[pos]) { pos++; }
+                    else {
+                        while(code[a] != '\n' && a < size) { a++; }
+                        pos = 0, started = false;
+                    }
+                }
+                if(pos == 0) {
+                    _retset;
+                    ret.code = 6;
+                    return ret;
+                }
             }
+            
             for(uint8_t i = 0; i < argc + 1; i++) {
                 if(args[i].data != NULL) { free(args[i].data); }
                 tss_ainit(&args[i]);
