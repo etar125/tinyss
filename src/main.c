@@ -149,8 +149,9 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
         tss_ainit(&args[i]);
     }
     bool com = false;
-    tss_stack st;
+    tss_stack st, cst;
     tss_sinit(&st);
+    tss_sinit(&cst);
     tss_exception ret;
     ret.code = 0;
     
@@ -279,6 +280,65 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     _retset;
                     ret.code = 6;
                     return ret;
+                }
+            } else if(tss_strcmp(arg0, psize, "call", 4)) {
+                checkargc(1);
+                arg1 = tss_aget(&args[1]);
+                if(arg1[0] == '$') {
+                    _retset;
+                    ret.code = 4;
+                    return ret;
+                }
+                if(cst.sp == 0) {
+                    _retset;
+                    ret.code = 5;
+                    return ret;
+                } while(code[i] != '\n' && i < size) { i++; }
+                tmp1 = malloc(13);
+                tss_push(&cst, itoa(i, tmp1, 10));
+                free(tmp1);
+                
+                bool started = false;
+                int pos = 0;
+                for(size_t a = 0; a <= size; a++) {
+                    if(arg1[pos] == '\0') {
+                        if(a == size - 1 || code[a] == '\n') {
+                            while(code[a] != '\n' && a < size) {
+                                a++;
+                            } i = a;
+                            break;
+                        } while(code[a] != '\n' && a < size) {
+                            a++;
+                        } pos = 0;
+                        started = false;
+                    }
+                    if(code[a] == '\n' || a == size) {
+                        started = false;
+                        pos = 0;
+                        continue;
+                    }
+                    if(!started) {
+                        if(code[a] == ' ' || code[a] == '\t') { continue; }
+                        else if(code[a] != ':') {
+                            while(code[a] != '\n' && a < size) { a++; } pos = 0;
+                        } else { started = true; }
+                        continue;
+                    } if(code[a] == arg1[pos]) { pos++; }
+                    else {
+                        while(code[a] != '\n' && a < size) { a++; }
+                        pos = 0, started = false;
+                    }
+                }
+                if(pos == 0) {
+                    _retset;
+                    ret.code = 6;
+                    return ret;
+                }
+            } else if(tss_strcmp(arg0, psize, "ret", 3)) {
+                tmp1 = tss_pop(&cst);
+                if(tmp1 != NULL) {
+                    i = atoi(tmp1);
+                    free(tmp1);
                 }
             }
             

@@ -24,8 +24,10 @@ char* tss_pop(tss_stack *stack) {
 void tss_push(tss_stack *stack, char *data) {
     if(stack == NULL || data == NULL) { return; }
     if(stack->sp != 0) {
-        char *new = malloc(strlen(data));
+        size_t sz = strlen(data);
+        char *new = malloc(sz + 1);
         strcpy(new, data);
+        new[sz] = '\0';
         stack->data[--stack->sp] = new;
         return;
     }
