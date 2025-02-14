@@ -21,6 +21,11 @@ int main(void) {
     gpushb \"не должно выводиться\"\n\
     gcall printline\n\
     \n\
+    :call\n\
+    gpushb \"должно выводиться\"\n\
+    gcall printline\n\
+    ret\n\
+    \n\
     :main\n\
     \tdefine a 2\n\
         define\tb 512\n\
@@ -30,7 +35,8 @@ int main(void) {
     gpushb \"2^10 / (512 / -256) = '\n\
     gcall print\n\
     gpushb $a\n\
-    gcall printline";
+    gcall printline\n\
+    call call";
     tss_varlist list;
     tss_vlinit(&list);
     tss_printerr(tss_docode(&list, code, strlen(code)));
