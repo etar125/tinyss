@@ -36,7 +36,18 @@ int main(void) {
     gcall print\n\
     gpushb $a\n\
     gcall printline\n\
-    call call";
+    call call\n\
+    op a * -1\n\
+    if a g 512\n\
+        gpushb \"512 больше 512\"\n\
+        gcall printline\n\
+    elif a e 512\n\
+        gpushb '512 равно 512'\n\
+        gcall printline\n\
+    else\n\
+        gpushb '512 не больше 512'\n\
+        gcall printline\n\
+    end";
     tss_varlist list;
     tss_vlinit(&list);
     tss_printerr(tss_docode(&list, code, strlen(code)));
