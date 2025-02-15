@@ -11,6 +11,99 @@
 
 #define checkargc(e) if(argc != e) { _retset; ret.code = argc < e ? 3 : 2; return ret; }
 
+#define labelfind(e) \
+bool started = false;\
+int pos = 0;\
+for(size_t a = 0; a <= size; a++) {\
+    if(e[pos] == '\0') {\
+        if(a == size - 1 || code[a] == '\n') {\
+            while(code[a] != '\n' && a < size) {\
+                a++;\
+            } i = a;\
+            break;\
+        } while(code[a] != '\n' && a < size) {\
+            a++;\
+        } pos = 0;\
+        started = false;\
+    }\
+    if(code[a] == '\n' || a == size) {\
+        started = false;\
+        pos = 0;\
+        continue;\
+    }\
+    if(!started) {\
+        if(code[a] == ' ' || code[a] == '\t') { continue; }\
+        else if(code[a] != ':') {\
+            while(code[a] != '\n' && a < size) { a++; } pos = 0;\
+        } else { started = true; }\
+        continue;\
+    } if(code[a] == e[pos]) { pos++; }\
+    else {\
+        while(code[a] != '\n' && a < size) { a++; }\
+        pos = 0, started = false;\
+    }\
+}\
+if(pos == 0) {\
+    _retset;\
+    ret.code = 6;\
+    return ret;\
+}
+
+bool startswith(char *str, size_t at, size_t size, char *with);
+
+#define iffind() \
+int lvl = 0;\
+bool started = false;\
+for(size_t a = i + 1; a <= size; a++) {\
+    if(lvl != 0) {\
+        if(startswith(code, a, size, "if")) { lvl++; }\
+        else if(startswith(code, a, size, "end")) { lvl--; }\
+        while(code[a] != '\n' && a < size) { a++; }\
+        continue;\
+    }\
+    if(!started) {\
+        if(code[a] == ' ' || code[a] == '\t') { continue; }\
+        started = true;\
+    } if(startswith(code, a, size, "if")) {\
+        lvl++;\
+        while(code[a] != '\n' && a < size) { a++; }\
+        continue;\
+    } else if(startswith(code, a, size, "elif") || startswith(code, a, size, "end")\
+           || startswith(code, a, size, "else")) {\
+        i = a - 1;\
+        break;\
+    } else {\
+        started = false;\
+        while(code[a] != '\n' && a < size) { a++; }\
+    }\
+}
+
+#define iffindeo() \
+int lvl = 0;\
+bool started = false;\
+for(size_t a = i + 1; a <= size; a++) {\
+    if(lvl != 0) {\
+        if(startswith(code, a, size, "if")) { lvl++; }\
+        else if(startswith(code, a, size, "end")) { lvl--; }\
+        while(code[a] != '\n' && a < size) { a++; }\
+        continue;\
+    }\
+    if(!started) {\
+        if(code[a] == ' ' || code[a] == '\t') { continue; }\
+        started = true;\
+    } if(startswith(code, a, size, "if")) {\
+        lvl++;\
+        while(code[a] != '\n' && a < size) { a++; }\
+        continue;\
+    } else if(startswith(code, a, size, "end")) {\
+        i = a - 1;\
+        break;\
+    } else {\
+        started = false;\
+        while(code[a] != '\n' && a < size) { a++; }\
+    }\
+}
+
 bool tss_ie(char *data, size_t size);
 bool tss_strcmp(char *data1, size_t size1, char *data2, size_t size2);
 
@@ -28,7 +121,7 @@ char* itoa(int num, char* str, int base);
 int _pow(int i, int n);
 
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
-    uint8_t argc = 0;
+    uint8_t argc = 0, iflvl = 0;
     size_t i, ri = 0, line = 0, psize;
     char *arg0, *arg1, *arg2, *arg3, *arg4,
          *tmp1, *tmp2;
@@ -134,42 +227,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     return ret;
                 }
                 
-                bool started = false;
-                int pos = 0;
-                for(size_t a = 0; a <= size; a++) {
-                    if(arg1[pos] == '\0') {
-                        if(a == size - 1 || code[a] == '\n') {
-                            while(code[a] != '\n' && a < size) {
-                                a++;
-                            } i = a;
-                            break;
-                        } while(code[a] != '\n' && a < size) {
-                            a++;
-                        } pos = 0;
-                        started = false;
-                    }
-                    if(code[a] == '\n' || a == size) {
-                        started = false;
-                        pos = 0;
-                        continue;
-                    }
-                    if(!started) {
-                        if(code[a] == ' ' || code[a] == '\t') { continue; }
-                        else if(code[a] != ':') {
-                            while(code[a] != '\n' && a < size) { a++; } pos = 0;
-                        } else { started = true; }
-                        continue;
-                    } if(code[a] == arg1[pos]) { pos++; }
-                    else {
-                        while(code[a] != '\n' && a < size) { a++; }
-                        pos = 0, started = false;
-                    }
-                }
-                if(pos == 0) {
-                    _retset;
-                    ret.code = 6;
-                    return ret;
-                }
+                labelfind(arg1);
             } else if(tss_strcmp(arg0, psize, "call", 4)) {
                 checkargc(1);
                 arg1 = tss_aget(&args[1]);
@@ -187,47 +245,57 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 tss_push(&cst, itoa(i, tmp1, 10));
                 free(tmp1);
                 
-                bool started = false;
-                int pos = 0;
-                for(size_t a = 0; a <= size; a++) {
-                    if(arg1[pos] == '\0') {
-                        if(a == size - 1 || code[a] == '\n') {
-                            while(code[a] != '\n' && a < size) {
-                                a++;
-                            } i = a;
-                            break;
-                        } while(code[a] != '\n' && a < size) {
-                            a++;
-                        } pos = 0;
-                        started = false;
-                    }
-                    if(code[a] == '\n' || a == size) {
-                        started = false;
-                        pos = 0;
-                        continue;
-                    }
-                    if(!started) {
-                        if(code[a] == ' ' || code[a] == '\t') { continue; }
-                        else if(code[a] != ':') {
-                            while(code[a] != '\n' && a < size) { a++; } pos = 0;
-                        } else { started = true; }
-                        continue;
-                    } if(code[a] == arg1[pos]) { pos++; }
-                    else {
-                        while(code[a] != '\n' && a < size) { a++; }
-                        pos = 0, started = false;
-                    }
-                }
-                if(pos == 0) {
-                    _retset;
-                    ret.code = 6;
-                    return ret;
-                }
+                labelfind(arg1);
             } else if(tss_strcmp(arg0, psize, "ret", 3)) {
                 tmp1 = tss_pop(&cst);
                 if(tmp1 != NULL) {
                     i = atoi(tmp1);
                     free(tmp1);
+                }
+            } else if(tss_strcmp(arg0, psize, "if", 2) || tss_strcmp(arg0, psize, "elif", 4)) {
+                if(psize == 4 && iflvl) {
+                    iflvl--;
+                    iffindeo();
+                } else {
+                    checkargc(3);
+                    arg1 = tss_aget(&args[1]);
+                    arg2 = tss_aget(&args[2]);
+                    arg3 = tss_aget(&args[3]);
+                    arg1 = tss_getvar(list, arg1);
+                    arg3 = arg3[0] == '$' ? tss_getvar(list, arg3) : arg3;
+                    if(tmp1 == NULL || arg3 == NULL || arg2[0] == '\0') {
+                        _retset;
+                        ret.code = 4;
+                        return ret;
+                    }
+                    bool not = false, equ = false, tru = false;
+                    if(arg2[0] == 'n') {
+                        arg2++;
+                        not = true;
+                    } if(arg2[1] == 'e') { equ = true; }
+                    int a, b;
+                    if(arg2[0] == '\0') {
+                        _retset;
+                        ret.code = 4;
+                        return ret;
+                    } if(arg2[0] == 'e') { tru = !strcmp(arg1, arg3); }
+                    else if(arg2[0] == 'l')  {
+                        a = atoi(arg1);
+                        b = atoi(arg3);
+                        tru = equ ? a <= b : a < b;
+                    } else if(arg2[0] == 'g')  {
+                        a = atoi(arg1);
+                        b = atoi(arg3);
+                        tru = equ ? a >= b : a > b;
+                    }
+                    if(not) { tru = !(tru); }
+                    if(tru) { iflvl++; }
+                    else { iffind(); }
+                }
+            } else if(tss_strcmp(arg0, psize, "end", 3) || tss_strcmp(arg0, psize, "else", 4)) {
+                if(iflvl) {
+                    iflvl--;
+                    iffindeo();
                 }
             }
             
@@ -378,4 +446,14 @@ void reverse(char str[], int length) {
         if(!n) { break; }
         i *= i;
     } return res;
+}
+
+bool startswith(char *str, size_t at, size_t size, char *with) {
+    int pos = 0;
+    for(; at <= size; at++) {
+        if(with[pos] == '\0') { return true; }
+        if(at == size || str[at] == '\n') { return false; }
+        if(str[at] == with[pos]) { pos++; }
+        else { return false; }
+    } return false;
 }
