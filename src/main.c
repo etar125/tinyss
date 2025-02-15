@@ -11,132 +11,21 @@
 
 #define checkargc(e) if(argc != e) { _retset; ret.code = argc < e ? 3 : 2; return ret; }
 
-char *tss_code[] = {
-    "no error",
-    "test error?",
-    "too many args",
-    "not enough args",
-    "wrong args",
-    "stack overflow",
-    "not found label"
-};
+bool tss_ie(char *data, size_t size);
+bool tss_strcmp(char *data1, size_t size1, char *data2, size_t size2);
 
-void tss_printerr(tss_exception e) {
-    if(e.code == 0) return;
-    printf("%d:%d [%d] ", e.line, e.symbol, e.code);
-    if(e.code < 7) {
-        printf("%s\n", tss_code[e.code]);
-    } else {
-        printf("unknown error\n");
-    }
-}
-
-bool tss_ie(char *data, size_t size) {
-    for(size_t i = 0; i < size; i++) {
-        if(data[i] >= '!') return false;
-    } return true;
-}
-bool tss_strcmp(char *data1, size_t size1, char *data2, size_t size2) {
-    if(size1 != size2) return false;
-    for(size_t i = 0; i < size1; i++) {
-        if(data1[i] != data2[i]) return false;
-    } return true;
-}
-
-char schar(char ch) {
-    if(ch == 'n') {
-        return '\n';
-    } else if(ch == 't') {
-        return '\t';
-    } else if(ch == 'a') {
-        return '\033';
-    } else if(ch == '\\') {
-        return '\\';
-    } else if(ch == '\'') {
-        return '\'';
-    } else if(ch == '"') {
-        return '"';
-    } return ch;
-}
+char schar(char ch);
 
 typedef struct {
     char *data;
     size_t size, pos;
 } tss_arg;
-void tss_ainit(tss_arg *a) {
-    if(a == NULL) { return; }
-    a->data = NULL;
-    a->pos = 0;
-} void tss_aadd(tss_arg *a, char ch) {
-    if(a == NULL) { return; }
-    if(a->data == NULL) {
-        a->size = 8;
-        a->data = malloc(8);
-        a->data[a->pos++] = ch;
-        return;
-    }
-    if(a->pos == a->size) {
-        char *old = a->data;
-        size_t prev = a->size;
-        a->size += prev / 2;
-        a->data = malloc(a->size);
-        memcpy(a->data, old, prev);
-        free(old);
-    } a->data[a->pos++] = ch;
-} char* tss_aget(tss_arg *a) {
-    if(a == NULL || a->data == NULL) { return NULL; }
-    if(a->pos == a->size) {
-        char *old = a->data;
-        size_t prev = a->size;
-        a->size += 1;
-        a->data = malloc(a->size);
-        memcpy(a->data, old, prev);
-        free(old);
-    } a->data[a->pos++] = '\0';
-    return a->data;
-}
+void tss_ainit(tss_arg *a);
+void tss_aadd(tss_arg *a, char ch);
+char* tss_aget(tss_arg *a);
 
-void reverse(char str[], int length) {
-    int start = 0;
-    int end = length - 1;
-    while(start < end) {
-        char temp = str[start];
-        str[start] = str[end];
-        str[end] = temp;
-        end--;
-        start++;
-    }
-} char* itoa(int num, char* str, int base) {
-    int i = 0;
-    bool m = false;
-    if(num == 0) {
-        str[i++] = '0';
-        str[i] = '\0';
-        return str;
-    }
-    if(num < 0 && base == 10) {
-        m = true;
-        num = -num;
-    }
-    while (num != 0) {
-        int rem = num % base;
-        str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
-        num = num / base;
-    }
-    if(m) { str[i++] = '-'; }
-    str[i] = '\0';
-    reverse(str, i);
-    return str;
-} int _pow(int i, int n) {
-    int res = 1;
-    for(;;) {
-        if (n & 1)
-            res *= i;
-        n >>= 1;
-        if(!n) { break; }
-        i *= i;
-    } return res;
-}
+char* itoa(int num, char* str, int base);
+int _pow(int i, int n);
 
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 0;
@@ -366,4 +255,127 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
         } else if(code[i] == '\\') { tss_aadd(&args[argc], schar(code[++i])); }
         else { tss_aadd(&args[argc], code[i]); }
     } return ret;
+}
+
+char *tss_code[] = {
+    "no error",
+    "test error?",
+    "too many args",
+    "not enough args",
+    "wrong args",
+    "stack overflow",
+    "not found label"
+};
+
+void tss_printerr(tss_exception e) {
+    if(e.code == 0) return;
+    printf("%d:%d [%d] ", e.line, e.symbol, e.code);
+    if(e.code < 7) {
+        printf("%s\n", tss_code[e.code]);
+    } else {
+        printf("unknown error\n");
+    }
+}
+
+bool tss_ie(char *data, size_t size) {
+    for(size_t i = 0; i < size; i++) {
+        if(data[i] >= '!') return false;
+    } return true;
+}
+bool tss_strcmp(char *data1, size_t size1, char *data2, size_t size2) {
+    if(size1 != size2) return false;
+    for(size_t i = 0; i < size1; i++) {
+        if(data1[i] != data2[i]) return false;
+    } return true;
+}
+
+char schar(char ch) {
+    if(ch == 'n') {
+        return '\n';
+    } else if(ch == 't') {
+        return '\t';
+    } else if(ch == 'a') {
+        return '\033';
+    } else if(ch == '\\') {
+        return '\\';
+    } else if(ch == '\'') {
+        return '\'';
+    } else if(ch == '"') {
+        return '"';
+    } return ch;
+}
+
+void tss_ainit(tss_arg *a) {
+    if(a == NULL) { return; }
+    a->data = NULL;
+    a->pos = 0;
+} void tss_aadd(tss_arg *a, char ch) {
+    if(a == NULL) { return; }
+    if(a->data == NULL) {
+        a->size = 8;
+        a->data = malloc(8);
+        a->data[a->pos++] = ch;
+        return;
+    }
+    if(a->pos == a->size) {
+        char *old = a->data;
+        size_t prev = a->size;
+        a->size += prev / 2;
+        a->data = malloc(a->size);
+        memcpy(a->data, old, prev);
+        free(old);
+    } a->data[a->pos++] = ch;
+} char* tss_aget(tss_arg *a) {
+    if(a == NULL || a->data == NULL) { return NULL; }
+    if(a->pos == a->size) {
+        char *old = a->data;
+        size_t prev = a->size;
+        a->size += 1;
+        a->data = malloc(a->size);
+        memcpy(a->data, old, prev);
+        free(old);
+    } a->data[a->pos++] = '\0';
+    return a->data;
+}
+
+void reverse(char str[], int length) {
+    int start = 0;
+    int end = length - 1;
+    while(start < end) {
+        char temp = str[start];
+        str[start] = str[end];
+        str[end] = temp;
+        end--;
+        start++;
+    }
+} char* itoa(int num, char* str, int base) {
+    int i = 0;
+    bool m = false;
+    if(num == 0) {
+        str[i++] = '0';
+        str[i] = '\0';
+        return str;
+    }
+    if(num < 0 && base == 10) {
+        m = true;
+        num = -num;
+    }
+    while (num != 0) {
+        int rem = num % base;
+        str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
+        num = num / base;
+    }
+    if(m) { str[i++] = '-'; }
+    str[i] = '\0';
+    reverse(str, i);
+    return str;
+} int _pow(int i, int n) {
+    int res = 1;
+    for(;;) {
+        if (n & 1)
+            res *= i;
+        n >>= 1;
+        if(!n) { break; }
+        i *= i;
+    } return res;
 }
