@@ -44,10 +44,14 @@ int main(void) {
     elif a e 512\n\
         gpushb '512 равно 512'\n\
         gcall printline\n\
+        exit\n\
     else\n\
         gpushb '512 не больше 512'\n\
         gcall printline\n\
-    end";
+    end\n\
+    \n\
+    gpushb \"не должно выводиться\"\n\
+    gcall printline";
     tss_varlist list;
     tss_vlinit(&list);
     tss_printerr(tss_docode(&list, code, strlen(code)));
