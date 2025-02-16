@@ -13,7 +13,7 @@ void tss_gfunc(tss_varlist *list, tss_stack *stack, char *name) {
 
 int main(void) {
     char code[] =
-    ":rem main\n\
+    "# main\n\
     gpushb \"goto test\"\n\
     gcall printline\n\
     goto main\n\

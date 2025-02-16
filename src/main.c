@@ -326,7 +326,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     return ret;
                 }
             } else { tss_aadd(&args[argc], code[i]); }
-        } else if(code[i] == ':' && argc == 0 && args[0].data == NULL) {
+        } else if((code[i] == ':' || code[i] == ';' || code[i] == '#') && argc == 0 && args[0].data == NULL) {
             while(i < size && code[i] != '\n') { i++; }
             continue;
         } else if(code[i] == '\\') { tss_aadd(&args[argc], schar(code[++i])); }
