@@ -8,7 +8,10 @@
 #include <stdbool.h>
 
 #define _retset ret.line = line
-#define retret(a, b) _retset; ret.symbol = a; ret.code = b; return ret
+#define freeargs() for(uint8_t i = 0; i < argc + 1; i++) {\
+                if(args[i].data != NULL) { free(args[i].data); }\
+            }
+#define retret(a, b) _retset; ret.symbol = a; ret.code = b; freeargs(); return ret
 #define checkargc(e) if(argc != e) { retret(0, argc < e ? 3 : 2); }
 
 #define labelfind(e) \
@@ -266,12 +269,14 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     iffindeo();
                 }
             } else if(tss_strcmp(arg0, psize, "exit", 4)) {
-                if(argc > 1) { retret(0, 2); }
+                _retset;
+                ret.symbol = 0;
+                if(argc > 1) { ret.code = 2; }
                 if(argc == 1) {
                     arg1 = tss_aget(&args[1]);
-                    retret(args[1].cpos, (short)atoi(arg1));
+                    ret.code = (short)atoi(arg1);
                 } return ret;
-            }
+            } else { retret(0, 8); }
             
             for(uint8_t i = 0; i < argc + 1; i++) {
                 if(args[i].data != NULL) { free(args[i].data); }

@@ -71,6 +71,8 @@ int main(void) {
         exit"
     }, error3[] = {
         "exit 1"
+    }, error4[] = {
+        "exot"
     };
     tss_varlist list;
     tss_vlinit(&list);
@@ -80,5 +82,6 @@ int main(void) {
     _run(error1);
     _run(error2);
     _run(error3);
+    _run(error4);
     return 0;
 }
