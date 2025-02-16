@@ -3,7 +3,7 @@
 #include <string.h>
 #include <malloc.h>
 
-#define _run(e) tss_printerr(tss_docode(&list, e, strlen(e)));
+#define _run(e) sz = strlen(e); tss_printerrv(tss_docode(&list, e, sz), e, sz);
 
 void tss_gfunc(tss_varlist *list, tss_stack *stack, char *name) {
     if(strcmp(name, "printline") == 0) {
@@ -74,6 +74,7 @@ int main(void) {
     }, error4[] = {
         "exot"
     };
+    size_t sz = 0;
     tss_varlist list;
     tss_vlinit(&list);
     printf("default test:\n\n");

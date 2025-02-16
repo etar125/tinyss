@@ -12,7 +12,7 @@
                 if(args[i].data != NULL) { free(args[i].data); }\
             }
 #define retret(a, b) _retset; ret.symbol = a; ret.code = b; freeargs(); return ret
-#define checkargc(e) if(argc != e) { retret(0, argc < e ? 3 : 2); }
+#define checkargc(e) if(argc != e) { retret(args[0].cpos, argc < e ? 3 : 2); }
 
 #define labelfind(e) \
 bool started = false;\
@@ -152,7 +152,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 if(psize == 0 || (psize == 1 && arg1[0] == '$')) {
                     retret(args[1].cpos, 4);
                 } if(st.sp == 0) {
-                    retret(0, 5);
+                    retret(args[0].cpos, 5);
                 } tss_push(&st, arg1[0] == '$' ? tss_getvar(list, ++arg1) : arg1);
             } else if(tss_strcmp(arg0, psize, "gcall", 5)) {
                 checkargc(1);
@@ -216,7 +216,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 checkargc(1);
                 arg1 = tss_aget(&args[1]);
                 if(arg1[0] == '$') { retret(args[1].cpos, 4); }
-                if(cst.sp == 0) { retret(0, 7); }
+                if(cst.sp == 0) { retret(args[0].cpos, 7); }
                 while(code[i] != '\n' && i < size) { i++; }
                 tmp1 = malloc(13);
                 tss_push(&cst, itoa(i, tmp1, 10));
@@ -270,7 +270,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 }
             } else if(tss_strcmp(arg0, psize, "exit", 4)) {
                 _retset;
-                ret.symbol = 0;
+                ret.symbol = args[0].cpos;
                 if(argc > 1) { ret.code = 2; }
                 if(argc == 1) {
                     arg1 = tss_aget(&args[1]);
@@ -286,7 +286,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
             if(com) { com = false; }
             else { com = true; }
         } else if(code[i] == ' ' || code[i] == '\t') {
-            if(argc == 0 && args[0].data == NULL) { }
+            if(argc == 0 && args[0].data == NULL) { args[0].cpos++; }
             else if(!com) {
                 if(argc < 5) {
                     argc++;
@@ -320,6 +320,27 @@ void tss_printerr(tss_exception e) {
         printf("%s\n", tss_code[e.code]);
     } else {
         printf("unknown error\n");
+    }
+} void tss_printerrv(tss_exception e, char *code, long unsigned int size) {
+    tss_printerr(e);
+    if(e.code == 0) return;
+    int line = e.line, symbol = e.symbol, ri = 0, cur = 1;
+    bool printed = false;
+    size_t prev = 0;
+    for(size_t i = 0; i < size; i++, ri++) {
+        if(cur != line) {
+            while(code[i] != '\n' && i < size) { i++; }
+            ri = 0, cur++;
+            continue;
+        } if(!printed) {
+            prev = i, printed = true;
+            while(code[i] != '\n' && i < size) {
+                printf("%c", code[i++]);
+            } printf("\n");
+            i = prev - 1;
+        } while(ri < symbol) {
+            printf(" "); ri++;
+        } printf("^\n"); break;
     }
 }
 

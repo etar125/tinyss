@@ -38,5 +38,6 @@ void tss_gfunc(tss_varlist *list, tss_stack *stack, char *name);
 tss_exception tss_docode(tss_varlist *list, char *code, long unsigned int size);
 
 void tss_printerr(tss_exception e);
+void tss_printerrv(tss_exception e, char *code, long unsigned int size);
 
 #endif
