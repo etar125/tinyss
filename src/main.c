@@ -152,8 +152,11 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     _retset;
                     ret.code = 4;
                     return ret;
-                }
-                tss_push(&st, arg1[0] == '$' ? tss_getvar(list, ++arg1) : arg1);
+                } if(st.sp == 0) {
+                    _retset;
+                    ret.code = 5;
+                    return ret;
+                } tss_push(&st, arg1[0] == '$' ? tss_getvar(list, ++arg1) : arg1);
             } else if(tss_strcmp(arg0, psize, "gcall", 5)) {
                 checkargc(1);
                 arg1 = tss_aget(&args[1]);
