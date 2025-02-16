@@ -124,8 +124,8 @@ int _pow(int i, int n);
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 0, iflvl = 0;
     size_t i, ri = 0, line = 0, psize;
-    char *arg0, *arg1, *arg2, *arg3, *arg4,
-         *tmp1, *tmp2;
+    char *arg0, *arg1, *arg2, *arg3, //*arg4,
+         *tmp1;
     tss_arg args[5];
     for(uint8_t i = 0; i < 5; i++) {
         args[i].data = NULL;
