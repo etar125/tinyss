@@ -297,6 +297,15 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     iflvl--;
                     iffindeo();
                 }
+            } else if(tss_strcmp(arg0, psize, "exit", 4)) {
+                _retset;
+                if(argc > 1) {
+                    ret.code = 2;
+                    return ret;
+                } if(argc == 1) {
+                    arg1 = tss_aget(&args[1]);
+                    ret.code = (short)atoi(arg1);
+                } return ret;
             }
             
             for(uint8_t i = 0; i < argc + 1; i++) {
