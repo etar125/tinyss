@@ -7,9 +7,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define _retset ret.line = line; ret.symbol = ri
-
-#define checkargc(e) if(argc != e) { _retset; ret.code = argc < e ? 3 : 2; return ret; }
+#define _retset ret.line = line
+#define retret(a, b) _retset; ret.symbol = a; ret.code = b; return ret
+#define checkargc(e) if(argc != e) { retret(0, argc < e ? 3 : 2); }
 
 #define labelfind(e) \
 bool started = false;\
@@ -44,9 +44,7 @@ for(size_t a = 0; a <= size; a++) {\
     }\
 }\
 if(pos == 0) {\
-    _retset;\
-    ret.code = 6;\
-    return ret;\
+    retret(args[1].cpos, 6);\
 }
 
 bool startswith(char *str, size_t at, size_t size, char *with);
@@ -111,7 +109,7 @@ char schar(char ch);
 
 typedef struct {
     char *data;
-    size_t size, pos;
+    size_t size, pos, cpos;
 } tss_arg;
 void tss_ainit(tss_arg *a);
 void tss_aadd(tss_arg *a, char ch);
@@ -149,33 +147,26 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 arg1 = tss_aget(&args[1]);
                 psize = strlen(arg1);
                 if(psize == 0 || (psize == 1 && arg1[0] == '$')) {
-                    _retset;
-                    ret.code = 4;
-                    return ret;
+                    retret(args[1].cpos, 4);
                 } if(st.sp == 0) {
-                    _retset;
-                    ret.code = 5;
-                    return ret;
+                    retret(0, 5);
                 } tss_push(&st, arg1[0] == '$' ? tss_getvar(list, ++arg1) : arg1);
             } else if(tss_strcmp(arg0, psize, "gcall", 5)) {
                 checkargc(1);
                 arg1 = tss_aget(&args[1]);
                 if(strlen(arg1) == 0 || arg1[0] == '$') {
-                    _retset;
-                    ret.code = 4;
-                    return ret;
+                    retret(args[1].cpos, 4);
                 }
                 tss_gfunc(list, &st, arg1);
             } else if(tss_strcmp(arg0, psize, "define", 6)) {
                 checkargc(2);
                 arg1 = tss_aget(&args[1]);
                 arg2 = tss_aget(&args[2]);
-                if(strlen(arg1) == 0 || arg1[0] == '$' || strlen(arg2) == 0) {
-                    _retset;
-                    ret.code = 4;
-                    return ret;
-                }
-                tss_setvar(list, arg1, arg2[0] == '$' ? tss_getvar(list, ++arg2) : arg2);
+                if(strlen(arg1) == 0 || arg1[0] == '$') {
+                    retret(args[1].cpos, 4);
+                } if(strlen(arg2) == 0) {
+                    retret(args[2].cpos, 4);
+                } tss_setvar(list, arg1, arg2[0] == '$' ? tss_getvar(list, ++arg2) : arg2);
             } else if(tss_strcmp(arg0, psize, "del", 3)) {
                 checkargc(1);
                 tss_delvar(list, tss_aget(&args[1]));
@@ -185,15 +176,9 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 arg2  = tss_aget(&args[2]);
                 arg3  = tss_aget(&args[3]);
                 arg3  = arg3[0] == '$' ? tss_getvar(list, ++arg3) : arg3;
-                if(arg1 == NULL || arg3 == NULL) {
-                    _retset;
-                    ret.code = 6;
-                    return ret;
-                } if(strlen(arg2) != 1) {
-                    _retset;
-                    ret.code = 4;
-                    return ret;
-                }
+                if(strlen(arg1) == 0) { retret(args[1].cpos, 4); }
+                if(arg3 == NULL) { retret(args[3].cpos, 4); }
+                if(strlen(arg2) != 1) { retret(args[2].cpos, 4); }
                 int a = atoi(tss_getvar(list, arg1)), b = atoi(arg3);
                 tmp1 = malloc(13);
                 switch(arg2[0]) {
@@ -216,38 +201,23 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                         tss_setvar(list, arg1, itoa(_pow(a, b), tmp1, 10));
                         break;
                     default:
-                        _retset;
-                        ret.code = 4;
-                        return ret;
+                        retret(args[2].cpos, 4);
                         break;
                 } free(tmp1);
             } else if(tss_strcmp(arg0, psize, "goto", 4)) {
                 checkargc(1);
                 arg1 = tss_aget(&args[1]);
-                if(arg1[0] == '$') {
-                    _retset;
-                    ret.code = 4;
-                    return ret;
-                }
-                
+                if(arg1[0] == '$') { retret(args[1].cpos, 4); }
                 labelfind(arg1);
             } else if(tss_strcmp(arg0, psize, "call", 4)) {
                 checkargc(1);
                 arg1 = tss_aget(&args[1]);
-                if(arg1[0] == '$') {
-                    _retset;
-                    ret.code = 4;
-                    return ret;
-                }
-                if(cst.sp == 0) {
-                    _retset;
-                    ret.code = 7;
-                    return ret;
-                } while(code[i] != '\n' && i < size) { i++; }
+                if(arg1[0] == '$') { retret(args[1].cpos, 4); }
+                if(cst.sp == 0) { retret(0, 7); }
+                while(code[i] != '\n' && i < size) { i++; }
                 tmp1 = malloc(13);
                 tss_push(&cst, itoa(i, tmp1, 10));
                 free(tmp1);
-                
                 labelfind(arg1);
             } else if(tss_strcmp(arg0, psize, "ret", 3)) {
                 tmp1 = tss_pop(&cst);
@@ -266,22 +236,17 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     arg3 = tss_aget(&args[3]);
                     arg1 = tss_getvar(list, arg1);
                     arg3 = arg3[0] == '$' ? tss_getvar(list, arg3) : arg3;
-                    if(tmp1 == NULL || arg3 == NULL || arg2[0] == '\0') {
-                        _retset;
-                        ret.code = 4;
-                        return ret;
-                    }
+                    if(arg1 == NULL) { retret(args[1].cpos, 4); }
+                    if(arg2[0] == '\0') { retret(args[2].cpos, 4); }
+                    if(arg3 == NULL) { retret(args[3].cpos, 4);  }
                     bool not = false, equ = false, tru = false;
                     if(arg2[0] == 'n') {
                         arg2++;
                         not = true;
                     } if(arg2[1] == 'e') { equ = true; }
                     int a, b;
-                    if(arg2[0] == '\0') {
-                        _retset;
-                        ret.code = 4;
-                        return ret;
-                    } if(arg2[0] == 'e') { tru = !strcmp(arg1, arg3); }
+                    if(arg2[0] == '\0') { retret(args[2].cpos, 4); }
+                    if(arg2[0] == 'e') { tru = !strcmp(arg1, arg3); }
                     else if(arg2[0] == 'l')  {
                         a = atoi(arg1);
                         b = atoi(arg3);
@@ -301,13 +266,10 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     iffindeo();
                 }
             } else if(tss_strcmp(arg0, psize, "exit", 4)) {
-                _retset;
-                if(argc > 1) {
-                    ret.code = 2;
-                    return ret;
-                } if(argc == 1) {
+                if(argc > 1) { retret(0, 2); }
+                if(argc == 1) {
                     arg1 = tss_aget(&args[1]);
-                    ret.code = (short)atoi(arg1);
+                    retret(args[1].cpos, (short)atoi(arg1));
                 } return ret;
             }
             
@@ -323,11 +285,8 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
             else if(!com) {
                 if(argc < 5) {
                     argc++;
-                } else {
-                    _retset;
-                    ret.code = 2;
-                    return ret;
-                }
+                    args[argc].cpos = ri + 1;
+                } else { retret(0, 2); }
             } else { tss_aadd(&args[argc], code[i]); }
         } else if((code[i] == ':' || code[i] == ';' || code[i] == '#') && argc == 0 && args[0].data == NULL) {
             while(i < size && code[i] != '\n') { i++; }
@@ -391,6 +350,7 @@ void tss_ainit(tss_arg *a) {
     if(a == NULL) { return; }
     a->data = NULL;
     a->pos = 0;
+    a->cpos = 0;
 } void tss_aadd(tss_arg *a, char ch) {
     if(a == NULL) { return; }
     if(a->data == NULL) {
