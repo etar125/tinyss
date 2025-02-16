@@ -3,6 +3,8 @@
 #include <string.h>
 #include <malloc.h>
 
+#define _run(e) tss_printerr(tss_docode(&list, e, strlen(e)));
+
 void tss_gfunc(tss_varlist *list, tss_stack *stack, char *name) {
     if(strcmp(name, "printline") == 0) {
         printf("%s\n", tss_pop(stack));
@@ -52,8 +54,31 @@ int main(void) {
     \n\
     gpushb \"не должно выводиться\"\n\
     gcall printline";
+
+    char error1[] = {
+        "gpushb a\n\
+        gpushb a\n\
+        gpushb a\n\
+        gpushb a\n\
+        gpushb a\n\
+        gpushb a\n\
+        gpushb a\n\
+        gpushb a\n\
+        gpushb a\n\
+        exit"
+    }, error2[] = {
+        "exit 3 2 1\n\
+        exit"
+    }, error3[] = {
+        "exit 1"
+    };
     tss_varlist list;
     tss_vlinit(&list);
-    tss_printerr(tss_docode(&list, code, strlen(code)));
+    printf("default test:\n\n");
+    _run(code);
+    printf("\nerror tests:\n\n");
+    _run(error1);
+    _run(error2);
+    _run(error3);
     return 0;
 }
