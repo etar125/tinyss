@@ -238,7 +238,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 }
                 if(cst.sp == 0) {
                     _retset;
-                    ret.code = 5;
+                    ret.code = 7;
                     return ret;
                 } while(code[i] != '\n' && i < size) { i++; }
                 tmp1 = malloc(13);
@@ -335,19 +335,21 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
 }
 
 char *tss_code[] = {
-    "no error",
-    "test error?",
-    "too many args",
-    "not enough args",
-    "wrong args",
-    "stack overflow",
-    "not found label"
+    "no error", // 0
+    "test error?", // 1
+    "too many args", // 2
+    "not enough args", // 3
+    "wrong args", // 4
+    "stack overflow", // 5
+    "not found label", // 6
+    "call stack overflow", // 7
+    "wrong command" // 8
 };
 
 void tss_printerr(tss_exception e) {
     if(e.code == 0) return;
     printf("%d:%d [%d] ", e.line, e.symbol, e.code);
-    if(e.code < 7) {
+    if(e.code < 9) {
         printf("%s\n", tss_code[e.code]);
     } else {
         printf("unknown error\n");
