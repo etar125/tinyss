@@ -2,8 +2,7 @@
 #define _TINYSS_H_
 
 typedef struct {
-    int line;
-    int symbol;
+    unsigned long int symbol;
     short code;
 } tss_exception;
 

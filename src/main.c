@@ -7,11 +7,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define _retset ret.line = line
 #define freeargs() for(uint8_t i = 0; i < argc + 1; i++) {\
                 if(args[i].data != NULL) { free(args[i].data); }\
             }
-#define retret(a, b) _retset; ret.symbol = a; ret.code = b; freeargs(); return ret
+#define retret(a, b) ret.symbol = a; ret.code = b; freeargs(); return ret
 #define checkargc(e) if(argc != e) { retret(args[0].cpos, argc < e ? 3 : 2); }
 
 #define labelfind(e) \
@@ -66,7 +65,6 @@ for(size_t a = i + 1; a <= size; a++) {\
         if(code[a] == ' ' || code[a] == '\t') { continue; }\
         started = true;\
     } if(startswith(code, a, size, "if")) {\
-        lvl++;\
         while(code[a] != '\n' && a < size) { a++; }\
         continue;\
     } else if(startswith(code, a, size, "elif") || startswith(code, a, size, "end")\
@@ -123,7 +121,7 @@ int _pow(int i, int n);
 
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 0, iflvl = 0;
-    size_t i, ri = 0, line = 0, psize;
+    size_t i, psize;
     char *arg0, *arg1, *arg2, *arg3, //*arg4,
          *tmp1;
     tss_arg args[5];
@@ -138,10 +136,9 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     tss_exception ret;
     ret.code = 0;
     
-    for(i = 0; i <= size; i++, ri++) {
+    for(i = 0; i <= size; i++) {
         if(i == size || code[i] == '\n') {
             if(argc == 0 && args[0].data == NULL) { continue; }
-            line++;
             arg0 = tss_aget(&args[0]);
             psize = strlen(arg0);
             if(tss_strcmp(arg0, psize, "nop", 3)) { }
@@ -269,7 +266,6 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     iffindeo();
                 }
             } else if(tss_strcmp(arg0, psize, "exit", 4)) {
-                _retset;
                 ret.symbol = args[0].cpos;
                 if(argc > 1) { ret.code = 2; }
                 if(argc == 1) {
@@ -281,7 +277,8 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
             for(uint8_t i = 0; i < argc + 1; i++) {
                 if(args[i].data != NULL) { free(args[i].data); }
                 tss_ainit(&args[i]);
-            } ri = 0, argc = 0;
+            } argc = 0;
+            args[0].cpos = i + 1;
         } else if((code[i] == '"' || code[i] == '\'')) {
             if(com) { com = false; }
             else { com = true; }
@@ -290,12 +287,11 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
             else if(!com) {
                 if(argc < 5) {
                     argc++;
-                    args[argc].cpos = ri + 1;
+                    args[argc].cpos = i + 1;
                 } else { retret(0, 2); }
             } else { tss_aadd(&args[argc], code[i]); }
         } else if((code[i] == ':' || code[i] == ';' || code[i] == '#') && argc == 0 && args[0].data == NULL) {
-            while(i < size && code[i] != '\n') { i++; }
-            continue;
+            while(i < size && code[i] != '\n') { i++; } args[0].cpos = i + 1;
         } else if(code[i] == '\\') { tss_aadd(&args[argc], schar(code[++i])); }
         else { tss_aadd(&args[argc], code[i]); }
     } return ret;
@@ -315,19 +311,28 @@ char *tss_code[] = {
 
 void tss_printerr(tss_exception e) {
     if(e.code == 0) return;
-    printf("%d:%d [%d] ", e.line, e.symbol, e.code);
+    printf("%lu [%d] ", e.symbol, e.code);
     if(e.code < 9) {
         printf("%s\n", tss_code[e.code]);
     } else {
         printf("unknown error\n");
     }
 } void tss_printerrv(tss_exception e, char *code, long unsigned int size) {
-    tss_printerr(e);
     if(e.code == 0) return;
-    int line = e.line, symbol = e.symbol, ri = 0, cur = 1;
-    bool printed = false;
+    tss_printerr(e);
+    size_t symbol = e.symbol;
     size_t prev = 0;
-    for(size_t i = 0; i < size; i++, ri++) {
+    size_t i = 0;
+    while(i < symbol) { i++; }
+    while(i != 0 && code[i] != '\n') { i--; }
+    if(code[i] == '\n') { i++; }
+    prev = i;
+    while(i < size && code[i] != '\n') { printf("%c", code[i]); i++; }
+    printf("\n");
+    i = prev;
+    while(i < symbol) { printf(" "); i++; }
+    printf("^\n");
+    /*for(size_t i = 0; i < size; i++, ri++) {
         if(cur != line) {
             while(code[i] != '\n' && i < size) { i++; }
             ri = 0, cur++;
@@ -338,10 +343,10 @@ void tss_printerr(tss_exception e) {
                 printf("%c", code[i++]);
             } printf("\n");
             i = prev - 1;
-        } while(ri < symbol) {
+        } while(ri <= symbol) {
             printf(" "); ri++;
         } printf("^\n"); break;
-    }
+    }*/
 }
 
 bool tss_ie(char *data, size_t size) {
