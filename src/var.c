@@ -19,8 +19,6 @@ void tss_vlapp(tss_varlist *list) {
         return;
     }
     
-    size_t prev_size = list->size;
-    
     /* change size */
     if(list->size <= 4) {
         list->size *= 4;
@@ -30,18 +28,7 @@ void tss_vlapp(tss_varlist *list) {
         list->size += list->size / 2;
     }
     
-    /* copy data */
-    tss_var *nlist = malloc(sizeof(tss_var) * list->size);
-    size_t i;
-    for(i = 0; i < prev_size; i++) {
-        nlist[i].name = list->list[i].name;
-        nlist[i].value = list->list[i].value;
-    } for(; i < list->size; i++) {
-        nlist[i].name = NULL;
-    }
-
-    free(list->list);
-    list->list = nlist;
+    list->list = realloc(list->list, sizeof(tss_var) * list->size);
 }
 
 size_t tss_findvar(tss_varlist *list, char *name) {
