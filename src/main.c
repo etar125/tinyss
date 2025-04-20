@@ -391,22 +391,14 @@ void tss_ainit(tss_arg *a) {
         return;
     }
     if(a->pos == a->size) {
-        char *old = a->data;
-        size_t prev = a->size;
-        a->size += prev / 2;
-        a->data = malloc(a->size);
-        memcpy(a->data, old, prev);
-        free(old);
+        a->size += a->size / 2;
+        a->data = realloc(a->data, a->size);
     } a->data[a->pos++] = ch;
 } char* tss_aget(tss_arg *a) {
     if(a == NULL || a->data == NULL) { return NULL; }
     if(a->pos == a->size) {
-        char *old = a->data;
-        size_t prev = a->size;
         a->size += 1;
-        a->data = malloc(a->size);
-        memcpy(a->data, old, prev);
-        free(old);
+        a->data = realloc(a->data, a->size);
     } a->data[a->pos++] = '\0';
     return a->data;
 }
