@@ -1,0 +1,3 @@
+#!/bin/bash
+make CFLAGS=-g
+valgrind --tool=memcheck --leak-check=full -s bin/test
