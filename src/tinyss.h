@@ -28,6 +28,7 @@ void tss_free(tss_stack *stack);
 
 void tss_vlinit(tss_varlist *list);
 void tss_vlapp(tss_varlist *list);
+void tss_vlfree(tss_varlist *list);
 
 long unsigned int tss_findvar(tss_varlist *list, char *name);
 void tss_setvar(tss_varlist *list, char *name, char *val);

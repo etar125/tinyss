@@ -74,7 +74,7 @@ int main(void) {
     }, error4[] = {
         "exot"
     };
-    char ctb[] = {
+    /*char ctb[] = {
 "define i 0\n\
 gpushb start\n\
 gcall printline\n\
@@ -86,7 +86,7 @@ gcall printline\n\
     end\n\
     op i + 1\n\
 goto loop"
-    };
+    };*/
     size_t sz = 0;
     tss_varlist list;
     tss_vlinit(&list);
@@ -97,7 +97,8 @@ goto loop"
     _run(error2);
     _run(error3);
     _run(error4);
-    printf("\nсчёт до 1 млн:\n\n");
-    _run(ctb);
+    /*printf("\nсчёт до 1 млн:\n\n");
+    _run(ctb);*/
+    tss_vlfree(&list);
     return 0;
 }

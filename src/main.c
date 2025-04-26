@@ -10,7 +10,8 @@
 #define freeargs() for(uint8_t i = 0; i < argc + 1; i++) {\
                 if(args[i].data != NULL) { free(args[i].data); }\
             }
-#define retret(a, b) ret.symbol = a; ret.code = b; freeargs(); return ret
+
+#define retret(a, b) ret.symbol = a; ret.code = b; tss_free(&st); tss_free(&cst); freeargs(); return ret
 #define checkargc(e) if(argc != e) { retret(args[0].cpos, argc < e ? 3 : 2); }
 
 #define labelfind(e) \
@@ -158,9 +159,6 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     retret(args[1].cpos, 4);
                 }
                 tss_gfunc(list, &st, arg1);
-                #ifndef TINYSS_MF
-                tss_free(&st);
-                #endif
             } else if(tss_strcmp(arg0, psize, "define", 6)) {
                 checkargc(2);
                 arg1 = tss_aget(&args[1]);
@@ -226,7 +224,6 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 tmp1 = tss_pop(&cst);
                 if(tmp1 != NULL) {
                     i = atoi(tmp1);
-                    free(tmp1);
                 }
             } else if(tss_strcmp(arg0, psize, "if", 2) || tss_strcmp(arg0, psize, "elif", 4)) {
                 if(psize == 4 && iflvl) {
@@ -274,7 +271,9 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 if(argc == 1) {
                     arg1 = tss_aget(&args[1]);
                     ret.code = (short)atoi(arg1);
-                } return ret;
+                } freeargs(); tss_free(&st);
+                tss_free(&cst);
+                return ret;
             } else { retret(0, 8); }
             
             for(uint8_t i = 0; i < argc + 1; i++) {
@@ -297,7 +296,12 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
             while(i < size && code[i] != '\n') { i++; } args[0].cpos = i + 1;
         } else if(code[i] == '\\') { tss_aadd(&args[argc], schar(code[++i])); }
         else { tss_aadd(&args[argc], code[i]); }
-    } return ret;
+    }
+    #ifndef TINYSS_MF
+    tss_free(&st);
+    tss_free(&cst);
+    #endif
+    return ret;
 }
 
 char *tss_code[] = {
@@ -392,8 +396,7 @@ void tss_ainit(tss_arg *a) {
         a->data = malloc(8);
         a->data[a->pos++] = ch;
         return;
-    }
-    if(a->pos == a->size) {
+    } if(a->pos == a->size) {
         a->size += a->size / 2;
         a->data = realloc(a->data, a->size);
     } a->data[a->pos++] = ch;

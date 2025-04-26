@@ -31,6 +31,16 @@ void tss_vlapp(tss_varlist *list) {
     list->list = realloc(list->list, sizeof(tss_var) * list->size);
 }
 
+void tss_vlfree(tss_varlist *list) {
+    if(list == NULL || list->list == NULL) { return; }
+    for(size_t i = 0; i < list->size; i++) {
+        if(list->list[i].name != NULL) {
+            free(list->list[i].name);
+            free(list->list[i].value);
+        }
+    } free(list->list);
+}
+
 size_t tss_findvar(tss_varlist *list, char *name) {
     for(size_t i = 0; i < list->size; i++) {
         if(list->list[i].name != NULL &&
