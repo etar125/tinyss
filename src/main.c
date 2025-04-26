@@ -158,6 +158,9 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                     retret(args[1].cpos, 4);
                 }
                 tss_gfunc(list, &st, arg1);
+                #ifndef TINYSS_MF
+                tss_free(&st);
+                #endif
             } else if(tss_strcmp(arg0, psize, "define", 6)) {
                 checkargc(2);
                 arg1 = tss_aget(&args[1]);

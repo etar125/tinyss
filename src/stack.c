@@ -16,7 +16,9 @@ char* tss_pop(tss_stack *stack) {
     if(stack == NULL) { return NULL; }
     if(stack->sp != 8) {
         char *t = stack->data[stack->sp];
+        #ifdef TINYSS_MF
         stack->data[stack->sp++] = NULL;
+        #endif
         return t;
     } return NULL;
 }
@@ -31,5 +33,11 @@ void tss_push(tss_stack *stack, char *data) {
         stack->data[--stack->sp] = new;
         return;
     }
-    /* здесь должно быть сообщение об ошибке */
+}
+
+void tss_free(tss_stack *stack) {
+    if(stack == NULL) { return; }
+    for(unsigned char i = 0; i < 8; i++) {
+        if(stack->data[i] != NULL) { free(stack->data[i]); }
+    } stack->sp = 8;
 }

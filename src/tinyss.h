@@ -24,6 +24,7 @@ typedef struct {
 void tss_sinit(tss_stack *stack);
 char* tss_pop(tss_stack *stack);
 void tss_push(tss_stack *stack, char *data);
+void tss_free(tss_stack *stack);
 
 void tss_vlinit(tss_varlist *list);
 void tss_vlapp(tss_varlist *list);
