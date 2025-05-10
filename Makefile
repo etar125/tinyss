@@ -31,4 +31,4 @@ rebuild: clean build
 
 install: $(LIB)
 	install -m755 $(LIB) /lib/
-	install -m755 src/tinyss.h /usr/include/
+	install include/*.h /usr/include/
