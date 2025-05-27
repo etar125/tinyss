@@ -109,16 +109,8 @@ bool tss_strcmp(char *data1, size_t size1, char *data2, size_t size2);
 
 char schar(char ch);
 
-typedef struct {
-    char *data;
-    size_t size, pos, cpos;
-} tss_arg;
-void tss_ainit(tss_arg *a);
-void tss_aadd(tss_arg *a, char ch);
-char* tss_aget(tss_arg *a);
-
-char* itoa(int num, char* str, int base);
-int _pow(int i, int n);
+inline char* itoa(int num, char* str, int base);
+inline int _pow(int i, int n);
 
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 0, iflvl = 0;

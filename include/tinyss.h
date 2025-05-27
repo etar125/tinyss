@@ -21,6 +21,14 @@ typedef struct {
     unsigned char sp;
 } tss_stack;
 
+typedef struct {
+    char *data;
+    unsigned long int size, pos, cpos;
+} tss_arg;
+void tss_ainit(tss_arg *a);
+void tss_aadd(tss_arg *a, char ch);
+char* tss_aget(tss_arg *a);
+
 void tss_sinit(tss_stack *stack);
 char* tss_pop(tss_stack *stack);
 void tss_push(tss_stack *stack, char *data);
