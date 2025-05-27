@@ -1,5 +1,6 @@
 #ifndef _TINYSS_H_
 #define _TINYSS_H_
+#include <stdbool.h>
 
 typedef struct {
     unsigned long int symbol;
@@ -28,6 +29,8 @@ typedef struct {
 void tss_ainit(tss_arg *a);
 void tss_aadd(tss_arg *a, char ch);
 char* tss_aget(tss_arg *a);
+
+bool tss_strcmp(char *data1, unsigned long int size1, char *data2, unsigned long int size2);
 
 void tss_sinit(tss_stack *stack);
 char* tss_pop(tss_stack *stack);
