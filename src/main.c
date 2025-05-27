@@ -50,26 +50,26 @@ if(pos == 0) {\
     retret(args[1].cpos, 6);\
 }
 
-bool startswith(char *str, size_t at, size_t size, char *with);
+bool tss_startswith(char *str, size_t at, size_t size, char *with);
 
 #define iffind() \
 int lvl = 0;\
 bool started = false;\
 for(size_t a = i + 1; a <= size; a++) {\
     if(lvl != 0) {\
-        if(startswith(code, a, size, "if")) { lvl++; }\
-        else if(startswith(code, a, size, "end")) { lvl--; }\
+        if(tss_startswith(code, a, size, "if")) { lvl++; }\
+        else if(tss_startswith(code, a, size, "end")) { lvl--; }\
         while(code[a] != '\n' && a < size) { a++; }\
         continue;\
     }\
     if(!started) {\
         if(code[a] == ' ' || code[a] == '\t') { continue; }\
         started = true;\
-    } if(startswith(code, a, size, "if")) {\
+    } if(tss_startswith(code, a, size, "if")) {\
         while(code[a] != '\n' && a < size) { a++; }\
         continue;\
-    } else if(startswith(code, a, size, "elif") || startswith(code, a, size, "end")\
-           || startswith(code, a, size, "else")) {\
+    } else if(tss_startswith(code, a, size, "elif") || tss_startswith(code, a, size, "end")\
+           || tss_startswith(code, a, size, "else")) {\
         i = a - 1;\
         break;\
     } else {\
@@ -83,19 +83,19 @@ int lvl = 0;\
 bool started = false;\
 for(size_t a = i + 1; a <= size; a++) {\
     if(lvl != 0) {\
-        if(startswith(code, a, size, "if")) { lvl++; }\
-        else if(startswith(code, a, size, "end")) { lvl--; }\
+        if(tss_startswith(code, a, size, "if")) { lvl++; }\
+        else if(tss_startswith(code, a, size, "end")) { lvl--; }\
         while(code[a] != '\n' && a < size) { a++; }\
         continue;\
     }\
     if(!started) {\
         if(code[a] == ' ' || code[a] == '\t') { continue; }\
         started = true;\
-    } if(startswith(code, a, size, "if")) {\
+    } if(tss_startswith(code, a, size, "if")) {\
         lvl++;\
         while(code[a] != '\n' && a < size) { a++; }\
         continue;\
-    } else if(startswith(code, a, size, "end")) {\
+    } else if(tss_startswith(code, a, size, "end")) {\
         i = a - 1;\
         break;\
     } else {\
@@ -105,12 +105,50 @@ for(size_t a = i + 1; a <= size; a++) {\
 }
 
 bool tss_ie(char *data, size_t size);
-bool tss_strcmp(char *data1, size_t size1, char *data2, size_t size2);
 
 char schar(char ch);
 
-inline char* itoa(int num, char* str, int base);
-inline int _pow(int i, int n);
+inline void reverse(char str[], int length) {
+    int start = 0;
+    int end = length - 1;
+    while(start < end) {
+        char temp = str[start];
+        str[start] = str[end];
+        str[end] = temp;
+        end--;
+        start++;
+    }
+} inline char* itoa(int num, char* str, int base) {
+    int i = 0;
+    bool m = false;
+    if(num == 0) {
+        str[i++] = '0';
+        str[i] = '\0';
+        return str;
+    }
+    if(num < 0 && base == 10) {
+        m = true;
+        num = -num;
+    }
+    while (num != 0) {
+        int rem = num % base;
+        str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
+        num = num / base;
+    }
+    if(m) { str[i++] = '-'; }
+    str[i] = '\0';
+    reverse(str, i);
+    return str;
+} inline int _pow(int i, int n) {
+    int res = 1;
+    for(;;) {
+        if (n & 1)
+            res *= i;
+        n >>= 1;
+        if(!n) { break; }
+        i *= i;
+    } return res;
+}
 
 tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
     uint8_t argc = 0, iflvl = 0;
@@ -360,7 +398,7 @@ bool tss_strcmp(char *data1, size_t size1, char *data2, size_t size2) {
     } return true;
 }
 
-char schar(char ch) {
+inline char schar(char ch) {
     if(ch == 'n') {
         return '\n';
     } else if(ch == 't') {
@@ -401,49 +439,7 @@ void tss_ainit(tss_arg *a) {
     return a->data;
 }
 
-void reverse(char str[], int length) {
-    int start = 0;
-    int end = length - 1;
-    while(start < end) {
-        char temp = str[start];
-        str[start] = str[end];
-        str[end] = temp;
-        end--;
-        start++;
-    }
-} char* itoa(int num, char* str, int base) {
-    int i = 0;
-    bool m = false;
-    if(num == 0) {
-        str[i++] = '0';
-        str[i] = '\0';
-        return str;
-    }
-    if(num < 0 && base == 10) {
-        m = true;
-        num = -num;
-    }
-    while (num != 0) {
-        int rem = num % base;
-        str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
-        num = num / base;
-    }
-    if(m) { str[i++] = '-'; }
-    str[i] = '\0';
-    reverse(str, i);
-    return str;
-} int _pow(int i, int n) {
-    int res = 1;
-    for(;;) {
-        if (n & 1)
-            res *= i;
-        n >>= 1;
-        if(!n) { break; }
-        i *= i;
-    } return res;
-}
-
-bool startswith(char *str, size_t at, size_t size, char *with) {
+bool tss_startswith(char *str, size_t at, size_t size, char *with) {
     int pos = 0;
     for(; at <= size; at++) {
         if(with[pos] == '\0') { return true; }
