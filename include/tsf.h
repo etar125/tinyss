@@ -2,13 +2,13 @@
 #define _TINYSS_FILE_H_
 
 typedef struct {
-    unsigned short nsize;
+    unsigned char nsize;
     char *name;
     unsigned long int pos;
 } tsf_func;
 
 typedef struct {
-    unsigned int tsize;
+    unsigned short tsize;
     tsf_func *table;
     unsigned long int csize;
     char *code;
