@@ -22,7 +22,8 @@ typedef enum {
     ADD   = 16,
     INS   = 17,
     LEN   = 18,
-    SUB   = 19
+    SUB   = 19,
+    NOP   = 20
 } tbc_opcode;
 
 tsf_file tbc_compile(char *code, unsigned long int size);
