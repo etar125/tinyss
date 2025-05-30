@@ -104,11 +104,25 @@ for(size_t a = i + 1; a <= size; a++) {\
     }\
 }
 
-bool tss_ie(char *data, size_t size);
+// bool tss_ie(char *data, size_t size);
 
-char schar(char ch);
+inline char tss_schar(char ch)  {
+    if(ch == 'n') {
+        return '\n';
+    } else if(ch == 't') {
+        return '\t';
+    } else if(ch == 'a') {
+        return '\033';
+    } else if(ch == '\\') {
+        return '\\';
+    } else if(ch == '\'') {
+        return '\'';
+    } else if(ch == '"') {
+        return '"';
+    } return ch;
+}
 
-inline void reverse(char str[], int length) {
+inline void tss_reverse(char str[], int length) {
     int start = 0;
     int end = length - 1;
     while(start < end) {
@@ -118,7 +132,7 @@ inline void reverse(char str[], int length) {
         end--;
         start++;
     }
-} inline char* itoa(int num, char* str, int base) {
+} inline char* tss_itoa(int num, char* str, int base) {
     int i = 0;
     bool m = false;
     if(num == 0) {
@@ -137,9 +151,9 @@ inline void reverse(char str[], int length) {
     }
     if(m) { str[i++] = '-'; }
     str[i] = '\0';
-    reverse(str, i);
+    tss_reverse(str, i);
     return str;
-} inline int _pow(int i, int n) {
+} inline int tss_pow(int i, int n) {
     int res = 1;
     for(;;) {
         if (n & 1)
@@ -214,22 +228,22 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 tmp1 = malloc(13);
                 switch(arg2[0]) {
                     case '+':
-                        tss_setvar(list, arg1, itoa(a + b, tmp1, 10));
+                        tss_setvar(list, arg1, tss_itoa(a + b, tmp1, 10));
                         break;
                     case '-':
-                        tss_setvar(list, arg1, itoa(a - b, tmp1, 10));
+                        tss_setvar(list, arg1, tss_itoa(a - b, tmp1, 10));
                         break;
                     case '*':
-                        tss_setvar(list, arg1, itoa(a * b, tmp1, 10));
+                        tss_setvar(list, arg1, tss_itoa(a * b, tmp1, 10));
                         break;
                     case '/':
-                        tss_setvar(list, arg1, itoa(a / b, tmp1, 10));
+                        tss_setvar(list, arg1, tss_itoa(a / b, tmp1, 10));
                         break;
                     case '%':
-                        tss_setvar(list, arg1, itoa(a % b, tmp1, 10));
+                        tss_setvar(list, arg1, tss_itoa(a % b, tmp1, 10));
                         break;
                     case '^':
-                        tss_setvar(list, arg1, itoa(_pow(a, b), tmp1, 10));
+                        tss_setvar(list, arg1, tss_itoa(tss_pow(a, b), tmp1, 10));
                         break;
                     default:
                         retret(args[2].cpos, 4);
@@ -247,7 +261,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
                 if(cst.sp == 0) { retret(args[0].cpos, 7); }
                 while(code[i] != '\n' && i < size) { i++; }
                 tmp1 = malloc(13);
-                tss_push(&cst, itoa(i, tmp1, 10));
+                tss_push(&cst, tss_itoa(i, tmp1, 10));
                 free(tmp1);
                 labelfind(arg1);
             } else if(tss_strcmp(arg0, psize, "ret", 3)) {
@@ -324,7 +338,7 @@ tss_exception tss_docode(tss_varlist *list, char *code, size_t size) {
             } else { tss_aadd(&args[argc], code[i]); }
         } else if((code[i] == ':' || code[i] == ';' || code[i] == '#') && argc == 0 && args[0].data == NULL) {
             while(i < size && code[i] != '\n') { i++; } args[0].cpos = i + 1;
-        } else if(code[i] == '\\') { tss_aadd(&args[argc], schar(code[++i])); }
+        } else if(code[i] == '\\') { tss_aadd(&args[argc], tss_schar(code[++i])); }
         else { tss_aadd(&args[argc], code[i]); }
     }
     #ifndef TINYSS_MF
@@ -386,32 +400,16 @@ void tss_printerr(tss_exception e) {
     }*/
 }
 
-bool tss_ie(char *data, size_t size) {
+/*bool tss_ie(char *data, size_t size) {
     for(size_t i = 0; i < size; i++) {
         if(data[i] >= '!') return false;
     } return true;
-}
+}*/
 bool tss_strcmp(char *data1, size_t size1, char *data2, size_t size2) {
     if(size1 != size2) return false;
     for(size_t i = 0; i < size1; i++) {
         if(data1[i] != data2[i]) return false;
     } return true;
-}
-
-inline char schar(char ch) {
-    if(ch == 'n') {
-        return '\n';
-    } else if(ch == 't') {
-        return '\t';
-    } else if(ch == 'a') {
-        return '\033';
-    } else if(ch == '\\') {
-        return '\\';
-    } else if(ch == '\'') {
-        return '\'';
-    } else if(ch == '"') {
-        return '"';
-    } return ch;
 }
 
 void tss_ainit(tss_arg *a) {
