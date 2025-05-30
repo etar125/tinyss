@@ -3,9 +3,7 @@
 #include <string.h>
 #include "tinyss.h"
 
-void tss_gfunc(tss_varlist *list, tss_stack *stack, char *name) {
-    
-}
+void tss_gfunc(tss_varlist *list, tss_stack *stack, char *name) { }
 
 int main(void) {
     char code[] = {
@@ -31,7 +29,7 @@ int main(void) {
     if(f.code != NULL) {
         printf("code size: %lu\ncode:\n", f.csize);
         for(size_t i = 0; i < f.csize; i++) {
-            if(f.code[i] < 22) { printf("%d ", (int)f.code[i]); }
+            if(f.code[i] < 31) { printf("%u ", (unsigned int)f.code[i]); }
             else { printf("%c ", f.code[i]); }
         } printf("\n");
     }

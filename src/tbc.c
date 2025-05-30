@@ -54,7 +54,7 @@ tsf_file tbc_compile(char *code, unsigned long int size) {
     ret.code = NULL;
     if(code == NULL || size == 0) { return ret; }
     uint8_t argc = 0;
-    char opcode = 0;
+    uint8_t opcode = 0;
     tss_arg args[5];
     for(int8_t i = 0; i < 5; i++) {
         args[i].data = NULL;
@@ -112,14 +112,16 @@ tsf_file tbc_compile(char *code, unsigned long int size) {
             for(char i = 0; i < 21; i++) {
                 if(tss_strcmp(arg, psize, opcodes[i], strlen(opcodes[i]))) { opcode = i; break; }
             }*/
-            write(&opcode, 1);
+            write((char*)&opcode, 1);
+
+            write((char*)&argc, 1);
 
             for(uint8_t i = 1; i < argc + 1; i++) {
                 arg = tss_aget(&args[i]);
                 psize = strlen(arg);
                 if(psize > 255) { ret.csize = 5; return ret; }
                 opcode = (uint8_t)psize;
-                write(&opcode, 1);
+                write((char*)&opcode, 1);
                 write(arg, psize);
             }
             
