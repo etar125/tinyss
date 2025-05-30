@@ -15,11 +15,7 @@ void tss_sinit(tss_stack *stack) {
 char* tss_pop(tss_stack *stack) {
     if(stack == NULL) { return NULL; }
     if(stack->sp != 8) {
-        char *t = stack->data[stack->sp];
-        #ifdef TINYSS_MF
-        stack->data[stack->sp++] = NULL;
-        #endif
-        return t;
+        return stack->data[stack->sp++];
     } return NULL;
 }
 
@@ -28,9 +24,10 @@ void tss_push(tss_stack *stack, char *data) {
     if(stack->sp != 0) {
         size_t sz = strlen(data);
         char *new = malloc(sz + 1);
-        strcpy(new, data);
+        memcpy(new, data, sz);
         new[sz] = '\0';
-        stack->data[--stack->sp] = new;
+        if(stack->data[--stack->sp] != NULL) { free(stack->data[stack->sp]); }
+        stack->data[stack->sp] = new;
         return;
     }
 }

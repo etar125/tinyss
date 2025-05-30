@@ -51,6 +51,7 @@ tsf_file tsf_read(char *path) {
 }
 
 void tsf_free(tsf_file *f) {
+    if(f == NULL) { return; }
     free(f->code);
     for(size_t i = 0; i < f->tsize; i++) {
         free(f->table[i].name);

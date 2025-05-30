@@ -6,7 +6,7 @@
 #include <string.h>
 #include "tinyss.h"
 
-inline char schar(char ch) {
+static inline char schar(char ch) {
     if(ch == 'n') {
         return '\n';
     } else if(ch == 't') {
@@ -21,30 +21,6 @@ inline char schar(char ch) {
         return '"';
     } return ch;
 }
-
-/*char opcodes[21][7] = {
-  "nul",
-  "define",
-  "delete",
-  "op",
-  "if",
-  "elif",
-  "else",
-  "end",
-  "call",
-  "fcall",
-  "gcall",
-  "push",
-  "pop",
-  "goto",
-  "ret",
-  "exit",
-  "stradd",
-  "strins",
-  "strlen",
-  "substr",
-  "nop"
-};*/
 
 tsf_file tbc_compile(char *code, unsigned long int size) {
     tsf_file ret;
@@ -107,11 +83,6 @@ tsf_file tbc_compile(char *code, unsigned long int size) {
             else if(tss_strcmp(arg, psize, "strlen", 6)) { opcode = 18; }
             else if(tss_strcmp(arg, psize, "substr", 6)) { opcode = 19; }
             else if(tss_strcmp(arg, psize, "nop", 3)) { opcode = 20; }
-            /* данный код хуже того, что выше, ведь я не могу нормально
-               сделать несколько вариантов написаний для одного и того же опкода
-            for(char i = 0; i < 21; i++) {
-                if(tss_strcmp(arg, psize, opcodes[i], strlen(opcodes[i]))) { opcode = i; break; }
-            }*/
             write((char*)&opcode, 1);
 
             write((char*)&argc, 1);
@@ -129,24 +100,22 @@ tsf_file tbc_compile(char *code, unsigned long int size) {
                 if(args[i].data != NULL) { free(args[i].data); }
                 tss_ainit(&args[i]);
             } argc = 0;
-            args[0].cpos = i + 1;
         } else if((code[i] == '"' || code[i] == '\'')) {
             if(com) { com = false; }
             else { com = true; }
         } else if(code[i] == ' ' || code[i] == '\t') {
-            if(argc == 0 && args[0].data == NULL) { args[0].cpos++; }
+            if(argc == 0 && args[0].data == NULL) { }
             else if(!com) {
                 if(argc < 5) {
                     argc++;
-                    args[argc].cpos = i + 1;
                 } else { ret.csize = 2; return ret;  }
             } else { tss_aadd(&args[argc], code[i]); }
         } else if((code[i] == ';' || code[i] == '#') && argc == 0 && args[0].data == NULL) {
-            while(i < size && code[i] != '\0' && code[i] != '\n') { i++; } args[0].cpos = i + 1;
+            while(i < size && code[i] != '\0' && code[i] != '\n') { i++; }
         } else if(code[i] == ':' && argc == 0 && args[0].data == NULL) {
             i++;
             psize = i;
-            while(i < size && code[i] != '\0' && code[i] != '\n') { i++; } args[0].cpos = i + 1;
+            while(i < size && code[i] != '\0' && code[i] != '\n') { i++; }
             psize = i - psize;
             if(psize > 255) { ret.csize = 3; return ret; }
             arg = malloc(psize + 1);

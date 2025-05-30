@@ -24,7 +24,7 @@ typedef struct {
 
 typedef struct {
     char *data;
-    unsigned long int size, pos, cpos;
+    unsigned long int size, pos;
 } tss_arg;
 
 typedef struct {
@@ -92,7 +92,7 @@ char* tss_getvar(tss_varlist *list, char *name);
 void tss_delvar(tss_varlist *list, char *name);
 
 void tss_gfunc(tss_varlist *list, tss_stack *stack, char *name);
-tss_exception tss_docode(tss_varlist *list, char *code, long unsigned int size);
+tss_exception tss_docode(tss_varlist *list, tsf_file *file);
 
 void tss_printerr(tss_exception e);
 void tss_printerrv(tss_exception e, char *code, long unsigned int size);
