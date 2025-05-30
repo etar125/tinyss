@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
-#include "tsf.h"
+#include "tinyss.h"
 
 void tsf_write(tsf_file *f, char *path) {
     FILE* file = fopen(path, "wb");

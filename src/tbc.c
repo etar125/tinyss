@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <malloc.h>
 #include <string.h>
-#include "tbc.h"
 #include "tinyss.h"
 
 inline char schar(char ch) {

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
-#include "../../include/tsf.h"
+#include "tinyss.h"
 
 int main(void) {
     tsf_file f;

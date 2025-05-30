@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-#include "tbc.h"
-#include "tsf.h"
 #include "tinyss.h"
 
 void tss_gfunc(tss_varlist *list, tss_stack *stack, char *name) {

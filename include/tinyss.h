@@ -26,6 +26,51 @@ typedef struct {
     char *data;
     unsigned long int size, pos, cpos;
 } tss_arg;
+
+typedef struct {
+    unsigned char nsize;
+    char *name;
+    unsigned long int pos;
+} tsf_func;
+
+typedef struct {
+    unsigned short tsize;
+    tsf_func *table;
+    unsigned long int csize;
+    char *code;
+} tsf_file;
+
+typedef enum {
+    NUL   = 0,
+    DEF   = 1,
+    DEL   = 2,
+    OP    = 3,
+    IF    = 4,
+    ELIF  = 5,
+    ELSE  = 6,
+    END   = 7,
+    CALL  = 8,
+    FCALL = 9,
+    GCALL = 10,
+    PUSH  = 11,
+    POP   = 12,
+    GOTO  = 13,
+    RET   = 14,
+    EXIT  = 15,
+    ADD   = 16,
+    INS   = 17,
+    LEN   = 18,
+    SUB   = 19,
+    NOP   = 20
+} tbc_opcode;
+
+void tsf_write(tsf_file *f, char *path);
+tsf_file tsf_read(char *path);
+void tsf_free(tsf_file *f);
+
+tsf_file tbc_compile(char *code, unsigned long int size);
+tsf_file tbc_compileFile(char *path);
+
 void tss_ainit(tss_arg *a);
 void tss_aadd(tss_arg *a, char ch);
 char* tss_aget(tss_arg *a);
