@@ -1,7 +1,19 @@
 #!/bin/bash
-make clean
-make CFLAGS=-g all
 
-valgrind --tool=memcheck --leak-check=full -s bin/test
-valgrind --tool=memcheck --leak-check=full -s bin/test2
-valgrind --tool=memcheck --leak-check=full -s bin/test3
+memcheck () {
+    valgrind --tool=memcheck --leak-check=full -s $1
+}
+
+if [ ! $@ ]; then
+    TARGETS="lib bin/test2"
+    CHECK="bin/test2"
+    make clean
+    make CFLAGS=-g $TARGETS
+    for c in $CHECK; do
+        memcheck $c
+    done
+else
+    for a in $@; do
+        memcheck $a
+    done
+fi
