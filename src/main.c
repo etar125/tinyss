@@ -68,7 +68,7 @@ static inline char tss_schar(char ch)  {
 }
 
 #define check() if(i > f->csize) { retret(as, 9); }
-#define checksize(x) if(i + x > f->csize) { retret(cur->pos, 9); }
+#define checksize(x) if(i + x > f->csize) { retret(cur->pos, 10); }
 
 tss_exception tss_docode(tss_varlist *list, tsf_file *f) {
     tss_stack st, cst;
@@ -84,7 +84,7 @@ tss_exception tss_docode(tss_varlist *list, tsf_file *f) {
     tss_arg args[4];
     tss_arg *cur;
     if(f->code == NULL || f->csize == 0) { retret(0, 9); }
-    for(size_t i = 0; i < f->csize; i++) {
+    for(size_t i = 0; i < f->csize;) {
         as = i;
         op = (tbc_opcode)f->code[i];
         i++; check();
@@ -92,13 +92,13 @@ tss_exception tss_docode(tss_varlist *list, tsf_file *f) {
         if(argc != 0) { i++; check(); }
         for(t8 = 0; t8 < argc; t8++) {
             cur = &args[t8];
-            cur->pos = i;
+            cur->pos = i + 1;
             cur->size = (size_t)f->code[i];
             i++; check();
             if(cur->size != 0) {
                 checksize(cur->size);
                 cur->data = &f->code[i];
-                i += cur->size - 1;
+                i += cur->size;
             } else { i++; }
             if(t8 != argc - 1) { check(); }
         }
@@ -116,13 +116,24 @@ tss_exception tss_docode(tss_varlist *list, tsf_file *f) {
                 retret(args[1].pos, 4);
             } if(st.sp == 0) {
                 retret(args[0].pos, 5);
-            } tss_push(&st, args[0].data);
+            } tss_push(&st, args[0].data[0] == '$' ? tss_getvar(list, args[0].data + 1) : args[0].data);
         } else if(op == GCALL) {
             checkargc(1);
             if(args[0].size == 0 || (args[0].size == 1 && args[0].data[0] == '$')) {
                 retret(args[0].pos, 4);
-            } tss_gfunc(list, &st, args[0].data[0] == '$' ? tss_getvar(list, ++args[0].data) : args[0].data);
-        } else { retret(0, 8); }
+            } tss_gfunc(list, &st, args[0].data[0] == '$' ? tss_getvar(list, args[0].data + 1) : args[0].data);
+        } else if(op == DEF) {
+            checkargc(2);
+            if(args[0].size == 0 || (args[0].size == 1 && args[0].data[0] == '$')) {
+                retret(args[0].pos, 4);
+            } if(args[1].size == 0 || (args[1].size == 1 && args[1].data[0] == '$')) {
+                retret(args[1].pos, 4);
+            }
+            tss_setvar(list, args[0].data[0] == '$' ? tss_getvar(list, args[0].data + 1) : args[0].data,
+                             args[1].data[0] == '$' ? tss_getvar(list, args[1].data + 1) : args[1].data);
+        }
+
+        else { retret(0, 8); }
         freeargs();
     }
     tss_free(&st);

@@ -11,8 +11,11 @@ void tss_gfunc(tss_varlist *list, tss_stack *stack, char *name) {
 
 int main(void) {
     char code[] = {
-    "gpushb 'Привет из TinySS!\\n'\n\
-    gcall echo"
+    "define from TinySS\n\
+    gpushb '!\\n'\n\
+    gpushb $from\n\
+    gpushb 'Привет из '\n\
+    gcall echo\ngcall echo\ngcall echo"
     };
     printf("compiling...\n");
     tsf_file f = tbc_compile(code, strlen(code));

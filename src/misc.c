@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
+#include "tinyss.h"
 
 char *tss_codes[] = {
     "no error",              // 0
@@ -13,18 +14,19 @@ char *tss_codes[] = {
     "not found label",       // 6
     "call stack overflow",   // 7
     "wrong command",         // 8
-    "compile error"          // 9
+    "wrong file format",     // 9
+    "wrong size"             // 10
 };
 
-/* void tss_printerr(tss_exception e) {
+ void tss_printerr(tss_exception e) {
     if(e.code == 0) return;
     printf("%lu [%d] ", e.symbol, e.code);
-    if(e.code < 10) {
-        printf("%s\n", tss_code[e.code]);
+    if(e.code < 11) {
+        printf("%s\n", tss_codes[e.code]);
     } else {
         printf("unknown error\n");
     }
-} void tss_printerrv(tss_exception e, char *code, long unsigned int size) {
+} /*void tss_printerrv(tss_exception e, char *code, long unsigned int size) {
     if(e.code == 0) return;
     tss_printerr(e);
     size_t symbol = e.symbol;
