@@ -1,50 +1,56 @@
-CC=gcc
-CFLAGS=-O2 -Wall
-LIB=bin/libtinyss.a
-TEST1=bin/test
-TEST2=bin/test2
-TEST3=bin/test3
-LIBSRC=src/main.c src/var.c src/stack.c src/tsf.c src/tbc.c src/misc.c
-LIBOBJ=$(patsubst src/%.c,bin/%.o,$(LIBSRC))
-TEST1SRC=src/test.c
-TEST1OBJ=$(patsubst src/%.c,bin/%.o,$(TEST1SRC))
-TEST2SRC=src/test2.c
-TEST2OBJ=$(patsubst src/%.c,bin/%.o,$(TEST2SRC))
-TEST3SRC=src/test3.c
-TEST3OBJ=$(patsubst src/%.c,bin/%.o,$(TEST3SRC))
-.PHONY: lib tests build cleanobj clean rebuild install
+CC := gcc
+CFLAGS := -O2 -Wall -Iinclude
+AR := ar
+LIB := bin/libtinyss.a
+TEST1 := bin/test1
+TEST2 := bin/test2
+TEST3 := bin/test3
 
-default: lib
+LIBSRC := src/main.c src/var.c src/stack.c src/tsf.c src/tbc.c src/misc.c
+TEST1SRC := src/test.c
+TEST2SRC := src/test2.c
+TEST3SRC := src/test3.c
+
+LIBOBJ := $(patsubst src/%.c,bin/%.o,$(LIBSRC))
+TEST1OBJ := $(patsubst src/%.c,bin/%.o,$(TEST1SRC))
+TEST2OBJ := $(patsubst src/%.c,bin/%.o,$(TEST2SRC))
+TEST3OBJ := $(patsubst src/%.c,bin/%.o,$(TEST3SRC))
+
+.PHONY: all lib tests clean cleanobj rebuild install
 
 all: lib tests
 
 lib: $(LIB)
 
-tests: $(LIB) $(TEST1) $(TEST2) $(TEST3)
+tests: $(TEST1) $(TEST2) $(TEST3)
 
 $(LIB): $(LIBOBJ)
-	ar r $@ $(LIBOBJ)
+	$(AR) rcs $@ $^
 
-$(TEST1): $(LIB) $(TEST1OBJ)
-	$(CC) $(TEST1OBJ) -o $@ ./bin/libtinyss.a
+$(TEST1): $(TEST1OBJ)
+	$(CC) $(CFLAGS) $< -o $@ -Lbin -ltinyss
 
-$(TEST2): $(LIB) $(TEST2OBJ)
-	$(CC) $(TEST2OBJ) -o $@ ./bin/libtinyss.a
-	
-$(TEST3): $(LIB) $(TEST3OBJ)
-	$(CC) $(TEST3OBJ) -o $@ ./bin/libtinyss.a
+$(TEST2): $(TEST2OBJ)
+	$(CC) $(CFLAGS) $< -o $@ -Lbin -ltinyss
 
-bin/%.o:
-	$(CC) -Iinclude -c $(CFLAGS) $(patsubst bin/%.o,src/%.c,$@) -o $@
+$(TEST3): $(TEST3OBJ)
+	$(CC) $(CFLAGS) $< -o $@ -Lbin -ltinyss
+
+bin/%.o: src/%.c | bin
+	$(CC) $(CFLAGS) -c $< -o $@
+
+bin:
+	mkdir -p bin
 
 cleanobj:
-	rm -rf bin/*.o
+	rm -f $(LIBOBJ) $(TEST1OBJ) $(TEST2OBJ) $(TEST3OBJ)
 
-clean:
-	rm -rf bin/*
+clean: cleanobj
+	rm -f $(LIB) $(TEST1) $(TEST2) $(TEST3)
 
 rebuild: clean all
 
 install: $(LIB)
-	sudo install -m755 $(LIB) /lib/
-	sudo install include/*.h /usr/include/
+	sudo install -d /lib /usr/include
+	sudo install -m644 $(LIB) /lib/
+	sudo install -m644 include/*.h /usr/include/
