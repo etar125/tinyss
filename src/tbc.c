@@ -66,7 +66,7 @@ tsf_file tbc_compile(char *code, unsigned long int size) {
             opcode = 0;
                  if(tss_strcmp(arg, psize, "nul", 3)) { opcode = 0; }
             else if(tss_strcmp(arg, psize, "define", 6)) { opcode = 1; }
-            else if(tss_strcmp(arg, psize, "delete", 6)) { opcode = 2; }
+            else if(tss_strcmp(arg, psize, "del", 3)) { opcode = 2; }
             else if(tss_strcmp(arg, psize, "op", 2)) { opcode = 3; }
             else if(tss_strcmp(arg, psize, "if", 2)) { opcode = 4; }
             else if(tss_strcmp(arg, psize, "elif", 4)) { opcode = 5; }
