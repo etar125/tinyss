@@ -131,6 +131,12 @@ tss_exception tss_docode(tss_varlist *list, tsf_file *f) {
             }
             tss_setvar(list, args[0].data[0] == '$' ? tss_getvar(list, args[0].data + 1) : args[0].data,
                              args[1].data[0] == '$' ? tss_getvar(list, args[1].data + 1) : args[1].data);
+        } else if(op == DEL) {
+            checkargc(1);
+            if(args[0].size == 0 || (args[0].size == 1 && args[0].data[0] == '$')) {
+                retret(args[0].pos, 4);
+            }
+            tss_delvar(list, args[0].data[0] == '$' ? tss_getvar(list, args[0].data + 1) : args[0].data);
         }
 
         else { retret(0, 8); }
