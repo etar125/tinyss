@@ -85,5 +85,6 @@ void tss_delvar(tss_varlist *list, char *name) {
     if(i != (size_t)-1) {
         free(list->list[i].value);
         free(list->list[i].name);
+        list->list[i].name = NULL;
     }
 }

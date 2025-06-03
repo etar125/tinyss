@@ -15,10 +15,7 @@ int main(void) {
     gpushb '!\\n'\n\
     gpushb $from\n\
     gpushb 'Привет из '\n\
-    gcall echo\ngcall echo\ngcall echo\n\
-    del from\n\
-    gpushb $from\n\
-    gcall echo\n"
+    gcall echo\ngcall echo\ngcall echo\n"
     };
     printf("compiling...\n");
     tsf_file f = tbc_compile(code, strlen(code));
